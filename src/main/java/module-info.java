@@ -12,5 +12,5 @@ module ru.alexpvl.guestbookfx {
     requires com.almasb.fxgl.all;
 
     opens ru.alexpvl.guestbookfx to javafx.fxml;
-    exports ru.alexpvl.guestbookfx;
+    exports ru.alexpvl.guestbookfx.server;
 }
