@@ -10,6 +10,8 @@ module ru.alexpvl.guestbookfx {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.datatransfer;
+    requires java.desktop;
 
     opens ru.alexpvl.guestbookfx to javafx.fxml;
     exports ru.alexpvl.guestbookfx.server;

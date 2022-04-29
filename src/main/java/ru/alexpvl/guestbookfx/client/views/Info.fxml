@@ -48,7 +48,7 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <Hyperlink layoutX="662.0" layoutY="648.0" text="Афиша" textAlignment="CENTER" textFill="#b10000">
+      <Hyperlink fx:id="poster" layoutX="662.0" layoutY="648.0" text="Афиша" textAlignment="CENTER" textFill="#b10000">
          <font>
             <Font name="Arial Bold" size="18.0" />
          </font>
