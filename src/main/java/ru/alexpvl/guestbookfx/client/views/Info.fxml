@@ -16,7 +16,7 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.alexpvl.guestbookfx.client.controllers.InfoController">
     <children>
-    <HBox prefHeight="100.0" prefWidth="900.0" style="-fx-background-color: #b22222;">
+    <HBox prefHeight="100.0" prefWidth="900.0" style="-fx-background-color: darkred;">
         <children>
             <AnchorPane prefHeight="100.0" prefWidth="900.0">
                 <children>

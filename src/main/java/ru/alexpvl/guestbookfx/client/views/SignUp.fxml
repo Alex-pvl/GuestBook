@@ -14,7 +14,7 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.alexpvl.guestbookfx.client.controllers.SingUpController">
     <children>
-        <HBox prefHeight="120.0" prefWidth="400.0" style="-fx-background-color: #b22222;">
+        <HBox prefHeight="120.0" prefWidth="400.0" style="-fx-background-color: darkred;">
             <children>
                 <AnchorPane prefHeight="60.0" prefWidth="400.0">
                     <children>
@@ -28,6 +28,11 @@
                                 <Font name="Arial" size="18.0" />
                             </font>
                         </Label>
+                  <Label layoutX="6.0" layoutY="5.0" text="Гостевая книга" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Label>
                     </children>
                 </AnchorPane>
             </children>
