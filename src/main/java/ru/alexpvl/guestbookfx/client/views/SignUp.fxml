@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.alexpvl.guestbookfx.client.controllers.SingUpController">
+<AnchorPane prefHeight="600.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.alexpvl.guestbookfx.client.controllers.SignUpController">
     <children>
         <HBox prefHeight="120.0" prefWidth="400.0" style="-fx-background-color: darkred;">
             <children>
@@ -60,7 +53,7 @@
                      <children>
                         <HBox prefHeight="32.0" prefWidth="310.0">
                            <children>
-                              <TextField prefHeight="32.0" prefWidth="310.0" promptText="Имя">
+                              <TextField fx:id="firstNameText" prefHeight="32.0" prefWidth="310.0" promptText="Имя">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -72,7 +65,7 @@
                         </HBox>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
+                              <Label fx:id="firstNameError" prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -81,7 +74,7 @@
                         </HBox>
                         <HBox prefHeight="32.0" prefWidth="310.0">
                            <children>
-                              <TextField prefHeight="32.0" prefWidth="310.0" promptText="Фамилия">
+                              <TextField fx:id="lastNameText" prefHeight="32.0" prefWidth="310.0" promptText="Фамилия">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -93,7 +86,7 @@
                         </HBox>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
+                              <Label fx:id="lastNameError" prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -102,7 +95,7 @@
                         </HBox>
                         <HBox prefHeight="32.0" prefWidth="310.0">
                            <children>
-                              <TextField prefHeight="32.0" prefWidth="310.0" promptText="Email">
+                              <TextField fx:id="emailText" prefHeight="32.0" prefWidth="310.0" promptText="Email">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -114,7 +107,7 @@
                         </HBox>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
+                              <Label fx:id="emailError" prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -123,7 +116,7 @@
                         </HBox>
                         <HBox prefHeight="32.0" prefWidth="310.0">
                            <children>
-                              <TextField prefHeight="32.0" prefWidth="310.0" promptText="Логин">
+                              <TextField fx:id="loginText" prefHeight="32.0" prefWidth="310.0" promptText="Логин">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -135,7 +128,7 @@
                         </HBox>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
+                              <Label fx:id="loginError" prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -144,19 +137,19 @@
                         </HBox>
                         <HBox prefHeight="32.0" prefWidth="310.0">
                            <children>
-                              <TextField prefHeight="32.0" prefWidth="310.0" promptText="Пароль">
+                              <PasswordField fx:id="passwordText" prefHeight="36.0" prefWidth="286.0" promptText="Пароль">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
                                  <HBox.margin>
                                     <Insets top="5.0" />
                                  </HBox.margin>
-                              </TextField>
+                              </PasswordField>
                            </children>
                         </HBox>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
+                              <Label fx:id="passwordError" prefHeight="18.0" prefWidth="326.0" text="Некорректно!" textFill="CRIMSON">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -165,7 +158,7 @@
                         </HBox>
                         <HBox prefHeight="39.0" prefWidth="286.0">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="218.0" style="-fx-background-color: coral;" text="Зарегистрироваться">
+                              <Button fx:id="signUpBtn" mnemonicParsing="false" prefHeight="40.0" prefWidth="218.0" style="-fx-background-color: coral;" text="Зарегистрироваться">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
@@ -181,7 +174,7 @@
             </GridPane>
          </children>
       </VBox>
-      <Button layoutX="293.0" layoutY="550.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="93.0" style="-fx-background-color: coral;" text="Войти">
+      <Button fx:id="signInBtn" layoutX="293.0" layoutY="550.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="93.0" style="-fx-background-color: coral;" text="Войти">
          <font>
             <Font name="Arial" size="18.0" />
          </font>
