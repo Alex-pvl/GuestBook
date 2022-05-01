@@ -33,12 +33,12 @@
             <Font name="Arial" size="25.0" />
          </font>
       </Label>
-      <Button fx:id="deleteUserBtn" layoutX="502.0" layoutY="546.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Удалить" textFill="WHITE">
+      <Button fx:id="deleteAccountButton" layoutX="502.0" layoutY="546.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Удалить" textFill="WHITE">
          <font>
             <Font name="Arial" size="16.0" />
          </font>
       </Button>
-      <Button fx:id="changeRoleBtn" layoutX="365.0" layoutY="546.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Сменить роль" textFill="WHITE">
+      <Button fx:id="changeRoleButton" layoutX="365.0" layoutY="546.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Сменить роль" textFill="WHITE">
          <font>
             <Font name="Arial" size="16.0" />
          </font>

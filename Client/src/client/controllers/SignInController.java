@@ -24,49 +24,49 @@ public class SignInController {
     private ResourceBundle resources;
 
     @FXML
-    private URL connection;
+    private URL location;
 
     @FXML
-    private Button signInBtn;
+    private Button signUpButton;
 
     @FXML
-    private Button signUpBtn;
+    private TextField loginField;
 
     @FXML
-    private TextField loginText;
+    private PasswordField passwordField;
 
     @FXML
-    private PasswordField passwordText;
+    private Button signInButton;
 
     @FXML
-    private Label loginError;
+    private Label errorLabel0;
 
     @FXML
-    private Label passwordError;
+    private Label errorLabel1;
 
     void init() {
-        loginError.setVisible(false);
-        passwordError.setVisible(false);
-        loginText.setStyle("-fx-border-color: grey");
-        passwordText.setStyle("-fx-border-color: grey");
+        errorLabel0.setVisible(false);
+        errorLabel1.setVisible(false);
+        loginField.setStyle("-fx-border-color: grey");
+        passwordField.setStyle("-fx-border-color: grey");
     }
 
     @FXML
     void initialize() {
         init();
-        // Войти
-        signInBtn.setOnAction(e -> {
-            login = loginText.getText();
-            password = passwordText.getText();
-            if (!Main.isConnected) {
+        //обрабатываем событие - нажатие на кнопку "Авторизоваться"
+        signInButton.setOnAction(actionEvent -> {
+            login = loginField.getText();
+            password = passwordField.getText();
+            if(!Main.isConnected) {
                 Main.client = new Client();
                 Main.client.enable();
                 Main.client.start();
-                while (!Main.isConnected) {
+                while (!Main.client.isConnected()){
                     try {
                         Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
                 Main.isConnected = Main.client.isConnected();
@@ -77,78 +77,83 @@ public class SignInController {
                 isFieldUsed = true;
             } else {
                 if (login.isEmpty()) {
-                    loginText.setStyle("-fx-border-color: red");
-                    loginError.setText("Поле не может быть пустым!");
-                    loginError.setVisible(true);
+                    loginField.setStyle("-fx-border-color: red");
+                    errorLabel0.setText("Введите соответсвующее поле!");
+                    errorLabel0.setVisible(true);
                 } else {
-                    loginText.setStyle("-fx-border-color: grey");
-                    loginError.setVisible(false);
+                    loginField.setStyle("-fx-border-color: grey");
+                    errorLabel0.setVisible(false);
                 }
                 if (password.isEmpty()) {
-                    passwordText.setStyle("-fx-border-color: red");
-                    passwordError.setText("Поле не может быть пустым!");
-                    passwordError.setVisible(true);
+                    passwordField.setStyle("-fx-border-color: red");
+                    errorLabel1.setText("Введите соответсвующее поле!");
+                    errorLabel1.setVisible(true);
                 } else {
-                    passwordText.setStyle("-fx-border-color: grey");
-                    passwordError.setVisible(false);
+                    passwordField.setStyle("-fx-border-color: grey");
+                    errorLabel1.setVisible(false);
                 }
             }
-
             if (Main.isConnected && isFieldUsed) {
-                String msign = Main.client.loginUser(login, password);
-                if (!(msign.equalsIgnoreCase("SignIn Error") || msign.equalsIgnoreCase("-1"))) {
-                    Main.client.setUserInfo(login, password);
-                    var user_data = msign.split(" ");
-                    if (Main.user.getRole() == 0) {
-                        System.out.println("User entered");
-                    } else {
-                        System.out.println("Admin entered");
+                try {
+                    String msign = Main.client.loginAccount(login, password);
+                    //если был найден аккаунт в базе, то регистрируемся
+                    if (!(msign.equalsIgnoreCase("authorize isn't success")
+                            || msign.equalsIgnoreCase("-1"))){
+                        Main.client.setUserInfo(login, password);
+                        var user_data = msign.split(" ");
+                        if (Main.user.getRole() == 1) {
+                            System.out.println("Hello, User!");
+                        }
+                        else
+                            System.out.println("Hello, Admin!");
+                        //скрываем предыдущее окно
+                        signInButton.getScene().getWindow().hide();
+                        //загружаем новое окно
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(getClass().getResource("/client/views/GuestBook.fxml"));
+                        try {
+                            loader.load();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Parent root = loader.getRoot();
+                        Stage stage = new Stage();
+                        stage.setScene(new Scene(root));
+                        stage.setResizable(false);
+                        stage.setTitle("Гостевая книга");
+                        stage.showAndWait();
                     }
-                    signInBtn.getScene().getWindow().hide();
-                    FXMLLoader loader = new FXMLLoader();
-                    loader.setLocation(getClass().getResource("/client/views/GuestBook.fxml"));
-                    try {
-                        loader.load();
-                    } catch (IOException exp) {
-                        exp.printStackTrace();
+                    else if (msign.equalsIgnoreCase("authorize isn't success")) {
+                        System.out.println(msign);
+                        passwordField.setStyle("-fx-border-color: red");
+                        loginField.setStyle("-fx-border-color: red");
+                        errorLabel0.setText("Неправильный логин/пароль!");
+                        errorLabel0.setVisible(true);
+                        errorLabel1.setText("Неправильный логин/пароль!");
+                        errorLabel1.setVisible(true);
+                        loginField.clear();
+                        passwordField.clear();
                     }
-                    Parent root = loader.getRoot();
-                    Stage stage = new Stage();
-                    stage.setScene(new Scene(root));
-                    stage.setResizable(false);
-                    stage.setTitle("Гостевая книга");
-                    stage.showAndWait();
+                    else if (msign.equalsIgnoreCase("-1"))
+                        System.out.println("Unknown Error");
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                 }
-                else if (msign.equalsIgnoreCase("SignIn Error")) {
-                    System.out.println(msign);
-                    passwordText.setStyle("-fx-border-color: red");
-                    loginText.setStyle("-fx-border-color: red");
-                    loginError.setText("Неправильный логин/пароль!");
-                    loginError.setVisible(true);
-                    passwordError.setText("Неправильный логин/пароль!");
-                    passwordError.setVisible(true);
-                    loginText.clear();
-                    passwordText.clear();
-                }
-                else if (msign.equalsIgnoreCase("-1")) {
-                    System.out.println("Unknown error");
-                }
-
             }
         });
-
-
-        // Регистрация
-        signUpBtn.setOnAction(e -> {
-            signUpBtn.getScene().getWindow().hide();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/views/SignUp.fxml"));
-            Parent root = null;
+        //обрабатываем событие - нажатие на кнопку "Зарегистрироваться"
+        signUpButton.setOnAction(actionEvent -> {
+            //скрываем предыдущее окно
+            signUpButton.getScene().getWindow().hide();
+            //загружаем новое окно
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/client/views/SignUp.fxml"));
             try {
-                root = loader.load();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
+            Parent root = loader.getRoot();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setResizable(false);
@@ -156,5 +161,4 @@ public class SignInController {
             stage.showAndWait();
         });
     }
-
 }

@@ -52,7 +52,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <TextArea fx:id="emailText" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+                        <TextArea fx:id="emailField" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>
@@ -69,7 +69,7 @@
                       <RowConstraints maxHeight="50.799963378906256" minHeight="0.0" prefHeight="25.59996337890624" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <TextArea fx:id="messageText" prefHeight="193.0" prefWidth="279.0" GridPane.rowIndex="1">
+                        <TextArea fx:id="commentField" prefHeight="193.0" prefWidth="279.0" GridPane.rowIndex="1">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -160,7 +160,7 @@
             <Font name="Arial" size="25.0" />
          </font>
       </Label>
-      <Button fx:id="saveBtn" layoutX="368.0" layoutY="536.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Применить" textFill="WHITE">
+      <Button fx:id="saveButton" layoutX="368.0" layoutY="536.0" mnemonicParsing="false" style="-fx-background-color: darkred;" text="Применить" textFill="WHITE">
          <font>
             <Font size="18.0" />
          </font>

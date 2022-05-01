@@ -1,6 +1,6 @@
 package client.main;
 
-import client.controllers.UsersController;
+import client.controllers.UsersController.Account;
 import client.bean.User;
 import client.controllers.GuestbookController.Note;
 
@@ -12,10 +12,10 @@ import java.util.List;
 
 public class Client extends Thread {
     private boolean isEnabled = false;
-    private boolean isConnected = false;
-    ObjectOutputStream out;
-    ObjectInputStream in;
+    ObjectOutputStream oout;
+    ObjectInputStream oin;
     static Socket socket;
+    private boolean isConnected = false;
 
     public boolean isConnected() {
         return isConnected;
@@ -31,90 +31,74 @@ public class Client extends Thread {
         System.out.println("enabled");
     }
 
-    public void disconnect() {
+    public void disconnect()  {
         try {
             if (isConnected) {
-                out.writeUTF("quit");
-                out.flush();
-                System.out.println("Client disconnected");
+                oout.writeUTF("quit");
+                oout.flush();
+                System.out.println("Client kill connections");
             }
             disable();
-        } catch (IOException e) {
+        }
+        catch(IOException e) {
             isConnected = false;
             isEnabled = false;
-            System.out.println("Exception: Client disconnected");
+            System.out.println("Клиент разорвал соединение");
         }
+
+
     }
 
-    public int registerUser(String firstName, String lastName, String login,
-                            String password, String email) {
+    public int registerAccount(String firstName, String lastName, String userName, String password, String email) throws IOException, InterruptedException {
         if (isConnected) {
-            String str = null;
-            try {
-                out.writeUTF("register");
-                out.flush();
-                out.writeUTF(firstName + " " + lastName + " " +
-                        login + " " + email + " " + password);
-                Thread.sleep(500);
-                str = in.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (str.equalsIgnoreCase("register success")) {
-                System.out.println(str);
+            String clientCommand = "register";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(firstName + " " + lastName + " " + userName + " " + email + " " + password);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("register success")) {
+                System.out.println(msign);
                 return 1;
             }
         }
         return -1;
     }
 
-    public String loginUser(String login, String password) {
+    public String loginAccount(String login, String password) throws IOException, InterruptedException {
         if (isConnected) {
-            try {
-                out.writeUTF("authorize");
-                out.flush();
-                out.writeUTF(login + " " + password);
-                out.flush();
-                Thread.sleep(500);
-                String str = in.readUTF();
-                if (str.equalsIgnoreCase("authorize success")) {
-                    System.out.println(str);
-                    str = in.readUTF();
-                    return str;
-                } else if (str.equalsIgnoreCase("authorize isn't success")) {
-                    return str;
-                }
-            } catch (IOException e) {
-                System.out.println("Client exception");
-            } catch (InterruptedException e) {
-                System.out.println("Client exception");
+            String clientCommand = "authorize";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(login + " " + password);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("authorize success")) {
+                System.out.println(msign);
+                msign = oin.readUTF();
+                return msign;
+            } else if (msign.equalsIgnoreCase("authorize isn't success")) {
+                return msign;
             }
         }
         return "-1";
     }
 
-    public int sendMessage(String email, String message) {
+    public int sendMessage(String email, String message) throws IOException, InterruptedException {
         if (isConnected) {
-            String str = null;
-            try {
-                String clientCommand = "send new message";
-                out.writeUTF(clientCommand);
-                out.flush();
-                out.writeUTF(email);
-                out.flush();
-                out.writeUTF(message);
-                out.flush();
-                Thread.sleep(500);
-                str = in.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (str.equalsIgnoreCase("save message success")) {
-                System.out.println(str);
+            String clientCommand = "send new message";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(email);
+            oout.flush();
+            oout.writeUTF(message);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("save message success")) {
+                System.out.println(msign);
                 return 1;
             }
             else {
@@ -124,127 +108,108 @@ public class Client extends Thread {
         return -1;
     }
 
-    public void setUserInfo(String login, String password) {
+    public void setUserInfo(String login, String password) throws IOException, InterruptedException {
         if (isConnected) {
-            try {
-                out.writeUTF("get user info");
-                out.flush();
-                out.writeUTF(login + " " + password);
-                out.flush();
-                Thread.sleep(500);
-                String msign = in.readUTF();
-                if (msign.equalsIgnoreCase("get user info success")){
-                    String data = in.readUTF();
-                    var user_data = data.split(" ");
-                    Main.user = new User(Integer.parseInt(user_data[0]), user_data[1],
-                            user_data[2], user_data[3], user_data[4],
-                            user_data[5], Integer.parseInt(user_data[6]));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            String clientCommand = "get user info";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(login + " " + password);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("get user info success")){
+                String data = oin.readUTF();
+                var user_data = data.split(" ");
+                Main.user = new User(Integer.parseInt(user_data[0]), user_data[1],
+                        user_data[2], user_data[3], user_data[4],
+                        user_data[5], Integer.parseInt(user_data[6]));
             }
+            System.out.println(Main.user.getId());
+            System.out.println(Main.user.getFirstName());
+            System.out.println(Main.user.getLastName());
+            System.out.println(Main.user.getEmail());
+            System.out.println(Main.user.getLogin());
+            System.out.println(Main.user.getPassword());
+            System.out.println(Main.user.getRole());
         }
     }
-    public List<Note> getAllComments (int dataSize){
+
+    public List<Note> getAllComments (int dataSize) throws IOException, InterruptedException {
         List<Note> data = new ArrayList<>();
         if (isConnected) {
-            try {
-                out.writeUTF("get all comments");
-                out.flush();
-                Thread.sleep(500);
-                String str = in.readUTF();
-                int i = 0;
-                if (str.equalsIgnoreCase("get all comments success")){
-                    System.out.println(str);
-                    while (i < dataSize) {
-                        String entry = in.readUTF();
-                        int id =  Integer.parseInt(entry);
-                        String email = in.readUTF();
-                        String message = in.readUTF();
-                        String date = in.readUTF();
-                        data.add(new Note(id,email,date,message));
-                        i++;
-                    }
+            String clientCommand = "get all messages";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            int i = 0;
+            if (msign.equalsIgnoreCase("get all messages success")){
+                System.out.println(msign);
+                while (i < dataSize) {
+                    String entry = oin.readUTF();
+                    int id =  Integer.parseInt(entry);
+                    String email = oin.readUTF();
+                    String message = oin.readUTF();
+                    String date = oin.readUTF();
+                    data.add(new Note(id,email,message, date));
+                    i++;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         return data;
     }
 
     public void saveUserChanges(String firstName, String lastName,
-                                String userName, String email, String password) {
-        String str = null;
-        try {
-            out.writeUTF("change user info");
-            out.flush();
-            out.writeUTF(firstName + " " + lastName + " " + userName
-                    + " " + email + " " + password + " " + Main.user.getId());
-            out.flush();
-            Thread.sleep(500);
-            str = in.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if (str.equalsIgnoreCase("change user info success")){
-            System.out.println(str);
+                                String userName, String email, String password)
+            throws IOException, InterruptedException {
+        String clientCommand = "change user info";
+        oout.writeUTF(clientCommand);
+        oout.flush();
+        oout.writeUTF(firstName + " " + lastName + " " + email
+                + " " + userName + " " + password + " " + Main.user.getId());
+        oout.flush();
+        Thread.sleep(500);
+        String msign = oin.readUTF();
+        if (msign.equalsIgnoreCase("change user info success")){
+            System.out.println(msign);
         }
         else {
             System.out.println("change user info isn't success");
         }
     }
 
-    public int getCountOfTable(String comments) {
-        try {
-            out.writeUTF("get count of table");
-            out.flush();
-            out.writeUTF(comments);
-            out.flush();
-            Thread.sleep(500);
-            String str = in.readUTF();
-            if (str.equalsIgnoreCase("get count of table success")){
-                String data = in.readUTF();
-                System.out.println(str);
-                return Integer.parseInt(data);
-            }
-            else {
-                System.out.println("get count of table isn't success");
-                return -1;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public int getCountOfTable(String comments) throws IOException, InterruptedException {
+        String clientCommand = "get count of table";
+        oout.writeUTF(clientCommand);
+        oout.flush();
+        oout.writeUTF(comments);
+        oout.flush();
+        Thread.sleep(500);
+        String msign = oin.readUTF();
+        if (msign.equalsIgnoreCase("get count of table success")){
+            String data = oin.readUTF();
+            System.out.println(msign);
+            return Integer.parseInt(data);
         }
-        return -1;
+        else {
+            System.out.println("get count of table isn't success");
+            return -1;
+        }
     }
 
-    public void deleteRowFromTable(int id, String table) {
+    public void deleteRowFromTable(int id, String table) throws IOException, InterruptedException {
         if (isConnected) {
-            String str = null;
-            try {
-                out.writeUTF("delete row");
-                out.flush();
-                out.writeUTF(String.valueOf(id));
-                out.flush();
-                out.writeUTF(table);
-                out.flush();
-                Thread.sleep(500);
-                str = in.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (str.equalsIgnoreCase("delete row success")){
-                System.out.println(str);
+            String clientCommand = "delete row";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(String.valueOf(id));
+            oout.flush();
+            oout.writeUTF(table);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("delete row success")){
+                System.out.println(msign);
             }
             else {
                 System.out.println("delete row isn't success");
@@ -252,27 +217,21 @@ public class Client extends Thread {
         }
     }
 
-    public void saveCommentChange(int id, String email, String comment) {
+    public void saveCommentChange(int id, String email, String comment) throws IOException, InterruptedException {
         if (isConnected){
-            String str = null;
-            try {
-                out.writeUTF("change comment");
-                out.flush();
-                out.writeUTF(String.valueOf(id));
-                out.flush();
-                out.writeUTF(email);
-                out.flush();
-                out.writeUTF(comment);
-                out.flush();
-                Thread.sleep(500);
-                str = in.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (str.equalsIgnoreCase("change comment success")){
-                System.out.println(str);
+            String clientCommand = "change comment";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(String.valueOf(id));
+            oout.flush();
+            oout.writeUTF(email);
+            oout.flush();
+            oout.writeUTF(comment);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("change comment success")){
+                System.out.println(msign);
             }
             else {
                 System.out.println("change comment isn't success");
@@ -280,84 +239,69 @@ public class Client extends Thread {
         }
     }
 
-    public List<UsersController.Account> getAllUsers(int dataSize) {
-        List<UsersController.Account> data = new ArrayList<>();
+    public List<Account> getAllUsers(int dataSize) throws IOException, InterruptedException {
+        List<Account> data = new ArrayList<>();
         if (isConnected) {
-            try {
-                out.writeUTF("get all users");
-                out.flush();
-                Thread.sleep(500);
-                String str = in.readUTF();
-                int i = 0;
-                if (str.equalsIgnoreCase("get all users success")){
-                    System.out.println(str);
-                    while (i < dataSize) {
-                        String entry = in.readUTF();
-                        int id =  Integer.parseInt(entry);
-                        String userName = in.readUTF();
-                        String email = in.readUTF();
-                        int role_id = Integer.parseInt(in.readUTF());
-                        String role;
-                        if (role_id == 0) {
-                            role = "Пользователь";
-                        }
-                        else if (role_id == 1){
-                            role = "Администратор";
-                        }
-                        else {
-                            role = "Неизвестная ошибка";
-                        }
-                        data.add(new UsersController.Account(id,userName,email,role));
-                        i++;
+            String clientCommand = "get all users";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            Thread.sleep(500);
+            String msign = oin.readUTF();
+            int i = 0;
+            if (msign.equalsIgnoreCase("get all users success")){
+                System.out.println(msign);
+                while (i < dataSize) {
+                    String entry = oin.readUTF();
+                    int id =  Integer.parseInt(entry);
+                    String userName = oin.readUTF();
+                    String email = oin.readUTF();
+                    int role_id = Integer.parseInt(oin.readUTF());
+                    String role;
+                    if (role_id == 1) {
+                        role = "Пользователь";
                     }
+                    else if (role_id == 2){
+                        role = "Администратор";
+                    }
+                    else {
+                        role = "Неизвестная ошибка";
+                    }
+                    data.add(new Account(id,userName,email,role));
+                    i++;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         return data;
     }
 
-    public void changeRoleId(int id, int role_id) {
+    public void changeRoleId(int id, int role_id) throws IOException {
         if (isConnected) {
-            String str = null;
-            try {
-                out.writeUTF("change role");
-                out.flush();
-                out.writeUTF(String.valueOf(id));
-                out.flush();
-                out.writeUTF(String.valueOf(role_id));
-                out.flush();
-                str = in.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (str.equalsIgnoreCase("change role success")){
-                System.out.println(str);
+            String clientCommand = "change role";
+            oout.writeUTF(clientCommand);
+            oout.flush();
+            oout.writeUTF(String.valueOf(id));
+            oout.flush();
+            oout.writeUTF(String.valueOf(role_id));
+            oout.flush();
+            String msign = oin.readUTF();
+            if (msign.equalsIgnoreCase("change role success")){
+                System.out.println(msign);
             } else {
                 System.out.println("change role isn't success");
             }
         }
     }
 
-    public boolean isUsed(String tableField, String value) {
-        int _value = 0;
-        try {
-            out.writeUTF("is used");
-            out.flush();
-            out.writeUTF(tableField);
-            out.flush();
-            out.writeUTF(value);
-            out.flush();
-            Thread.sleep(500);
-            _value = Integer.parseInt(in.readUTF());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public boolean isUsed(String tableField, String value) throws IOException, InterruptedException {
+        String clientCommand = "is used";
+        oout.writeUTF(clientCommand);
+        oout.flush();
+        oout.writeUTF(tableField);
+        oout.flush();
+        oout.writeUTF(value);
+        oout.flush();
+        Thread.sleep(500);
+        int _value = Integer.parseInt(oin.readUTF());
         if (_value != 0){
             return true;
         }
@@ -369,16 +313,18 @@ public class Client extends Thread {
     @Override
     public void run() {
         super.run();
-        // запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
+// запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
         while (isEnabled) {
             try {
-                socket = new Socket("localhost", 8083);
-                try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
-                    this.out = out;
-                    this.in = in;
+                socket = new Socket("localhost", 3345);
+                try (ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+                     ObjectInputStream oin = new ObjectInputStream(socket.getInputStream());) {
+
+
+                    this.oout = oout;
+                    this.oin = oin;
                     isConnected = true;
-                    String str = "";
+                    String msgin = "";
                     System.out.println("Connected");
                     while (!socket.isOutputShutdown() && isEnabled) {
                         //что здесь??????????
@@ -388,6 +334,7 @@ public class Client extends Thread {
                     isEnabled = false;
 
                 } catch (IOException ee) {
+                    // TODO Auto-generated catch block
                     ee.printStackTrace();
                 }
             } catch (IOException e) {
@@ -398,10 +345,8 @@ public class Client extends Thread {
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
-
+                //interrupt();
             }
         }
     }
-
-
 }

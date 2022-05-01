@@ -6,11 +6,11 @@ public class Message  {
     private String message;
     private String date;
 
-    public Message(int id, String email, String message, String date) {
+    public Message(int id, String date, String email, String message) {
         this.id = id;
+        this.date = date;
         this.email = email;
         this.message = message;
-        this.date = date;
     }
 
     public int getId() {

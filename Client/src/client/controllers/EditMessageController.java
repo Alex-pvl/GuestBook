@@ -1,5 +1,6 @@
 package client.controllers;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
@@ -12,9 +13,6 @@ import javafx.scene.control.TextArea;
 import client.main.Main;
 
 public class EditMessageController {
-    private String email;
-    private String message;
-
     @FXML
     private ResourceBundle resources;
 
@@ -28,20 +26,23 @@ public class EditMessageController {
     private Label dateLabel;
 
     @FXML
-    private TextArea emailText;
+    private TextArea emailField;
 
     @FXML
-    private TextArea messageText;
+    private TextArea commentField;
 
     @FXML
-    private Button saveBtn;
+    private Button saveButton;
 
-    private static final String regex =
-            "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    private String email;
+
+    private String comment;
+
+    private static final String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     void init() {
-        emailText.setStyle("-fx-border-color: grey");
-        messageText.setStyle("-fx-border-color: grey");
+        emailField.setStyle("-fx-border-color: grey");
+        commentField.setStyle("-fx-border-color: grey");
     }
 
     @FXML
@@ -49,31 +50,30 @@ public class EditMessageController {
         init();
         idLabel.setText(String.valueOf(Main.message.getId()));
         dateLabel.setText(Main.message.getDate());
-        emailText.setText(Main.message.getEmail());
-        emailText.setText(Main.message.getMessage());
+        emailField.setText(Main.message.getEmail());
+        commentField.setText(Main.message.getMessage());
 
-
-        saveBtn.setOnAction(actionEvent -> {
+        saveButton.setOnAction(actionEvent -> {
             init();
-            email = emailText.getText();
-            message = messageText.getText();
+            email = emailField.getText();
+            comment = commentField.getText();
             boolean isFieldUsed = false;
-            if (!(email.isEmpty() || message.isEmpty())) {
+            if (!(email.isEmpty() || comment.isEmpty())) {
                 isFieldUsed = true;
             } else {
                 if (email.isEmpty()) {
-                    emailText.setStyle("-fx-border-color: red");
-                    emailText.setPromptText("Поле не может быть пустым!");
+                    emailField.setStyle("-fx-border-color: red");
+                    emailField.setPromptText("Введите соответсвующее поле!");
                 } else {
-                    emailText.setStyle("-fx-border-color: grey");
-                    emailText.setPromptText("Введите Email...");
+                    emailField.setStyle("-fx-border-color: grey");
+                    emailField.setPromptText("Введите E-Mail...");
                 }
-                if (message.isEmpty()) {
-                    messageText.setStyle("-fx-border-color: red");
-                    messageText.setPromptText("Поле не может быть пустым");
+                if (comment.isEmpty()) {
+                    commentField.setStyle("-fx-border-color: red");
+                    commentField.setPromptText("Введите соответсвующее поле!");
                 } else {
-                    messageText.setStyle("-fx-border-color: grey");
-                    messageText.setPromptText("Введите сообщение...");
+                    commentField.setStyle("-fx-border-color: grey");
+                    commentField.setPromptText("Введите комментарий...");
                 }
             }
             boolean isEmailValid = false;
@@ -82,16 +82,21 @@ public class EditMessageController {
             if (matcher.matches()) {
                 isEmailValid = true;
             } else {
-                emailText.setStyle("-fx-border-color:red");
-                emailText.clear();
-                emailText.setPromptText("Неправильно введён E-Mail!");
+                emailField.setStyle("-fx-border-color:red");
+                emailField.clear();
+                emailField.setPromptText("Неправильно введён E-Mail!");
             }
             if (Main.isConnected && isFieldUsed && isEmailValid){
-                Main.client.saveCommentChange(Main.message.getId(), email, message);
-                saveBtn.getScene().getWindow().hide();
+                try {
+                    Main.client.saveCommentChange(Main.message.getId(), email, comment);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                saveButton.getScene().getWindow().hide();
             }
         });
 
     }
-
 }

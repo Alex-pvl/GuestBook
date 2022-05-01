@@ -15,10 +15,10 @@ import java.util.concurrent.Executors;
 public class Server {
     private static final String DB_USERNAME = "postgres"; //вход в базу данных
     private static final String DB_PASSWORD = "sa3862930ha";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/guestbook";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
 
     static ExecutorService executeIt = Executors.newFixedThreadPool(3);
-    static Vector<Map.Entry<Integer, ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();
+    static Vector<Map.Entry<Integer,ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();
     public static Connection connection;
 
     private static ServerSocket server;
@@ -45,9 +45,10 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // стартуем сервер на порту 8083 и инициализируем переменную для обработки консольных команд с самого сервера
-        try (ServerSocket server1 = new ServerSocket(8083);
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+        // стартуем сервер на порту 3345 и инициализируем переменную для обработки консольных команд с самого сервера
+        try (ServerSocket server1 = new ServerSocket(3345);
+
+             BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             server = server1;
             try {
                 connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
@@ -85,7 +86,7 @@ public class Server {
                 // в Runnable(при необходимости можно создать Callable)
                 // монопоточную нить = сервер - MonoThreadClientHandler и тот
                 // продолжает общение от лица сервера
-                var pair = new AbstractMap.SimpleEntry<>(++i, new ServerThread(client, i));
+                var pair = new AbstractMap.SimpleEntry<>(++i,new ServerThread(client,i));
                 clients.add(pair);
                 executeIt.execute(clients.lastElement().getValue());
                 System.out.print("Connection accepted.\n");

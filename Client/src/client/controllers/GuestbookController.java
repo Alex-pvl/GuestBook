@@ -21,7 +21,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import client.main.Main;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 public class GuestbookController {
+
     @FXML
     private ResourceBundle resources;
 
@@ -29,66 +33,61 @@ public class GuestbookController {
     private URL location;
 
     @FXML
-    private Button updateUserInfoBtn;
+    private Button updateUserInfoButton;
 
     @FXML
-    private Button infoBtn;
+    private Button informationButton;
 
     @FXML
     private Label adminLabel;
 
     @FXML
-    private Button deleteMessageBtn;
+    private Button deleteMessageButton;
 
     @FXML
-    private Button editMessageBtn;
+    private Button redactMessageButton;
 
     @FXML
-    private Button changeRoleBtn;
+    private Button changeRoleButton;
 
     @FXML
-    private Button exitBtn;
+    private Button quitButton;
 
     @FXML
-    private TextArea messageText;
+    private TextArea messageField;
 
     @FXML
-    private Button sendBtn;
+    private Button sendMessageButton;
 
     @FXML
     private Pagination pagination;
 
     @FXML
-    private Button updateTableBtn;
+    private Button updateTableButton;
 
+    //размер таблицы
     private static int dataSize = 0;
-
-    private final static int rowsPerPage = 10;
-
+    //таблица записей
     private TableView<Note> table = createTable();
-
+    //данные
     private List<Note> data = createData();
+    //количество строк на странице
+    private final static int rowsPerPage = 10;
 
     private TableView<Note> createTable() {
         TableView<Note> table = new TableView<>();
 
         TableColumn<Note, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(e -> e.getValue().id);
+        idColumn.setCellValueFactory(param -> param.getValue().id);
         idColumn.setPrefWidth(30);
         idColumn.setResizable(false);
         idColumn.setSortable(false);
 
-        TableColumn<Note, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(e -> e.getValue().email);
+        TableColumn<Note, String> emailColumn = new TableColumn<>("E-Mail");
+        emailColumn.setCellValueFactory(param -> param.getValue().email);
         emailColumn.setPrefWidth(150);
         emailColumn.setMinWidth(55);
         emailColumn.setSortable(false);
-
-        TableColumn<Note, String> messageColumn = new TableColumn<>("Комментарий");
-        messageColumn.setCellValueFactory(param -> param.getValue().message);
-        messageColumn.setMinWidth(110);
-        messageColumn.setPrefWidth(390);
-        messageColumn.setSortable(false);
 
         TableColumn<Note, String> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(param -> param.getValue().date);
@@ -96,21 +95,39 @@ public class GuestbookController {
         dateColumn.setMinWidth(45);
         dateColumn.setSortable(false);
 
-        table.getColumns().addAll(idColumn, emailColumn, messageColumn, dateColumn);
+        TableColumn<Note, String> messageColumn = new TableColumn<>("Комментарий");
+        messageColumn.setCellValueFactory(param -> param.getValue().message);
+        messageColumn.setMinWidth(110);
+        messageColumn.setPrefWidth(390);
+        messageColumn.setSortable(false);
+
+        table.getColumns().addAll(idColumn, emailColumn, dateColumn, messageColumn);
 
         return table;
     }
 
+    //этот метод используется для заполнения данных в таблицу
     private List<Note> createData() {
         updateDataSize();
         List<Note> data = null;
-        data = new ArrayList<>(Main.client.getAllComments(dataSize));
+        try {
+            data = new ArrayList<>(Main.client.getAllComments(dataSize));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return data;
-
     }
 
     void updateDataSize() {
-        dataSize = Main.client.getCountOfTable("comments");
+        try {
+            dataSize = Main.client.getCountOfTable("comments");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     void pageCount() {
@@ -126,7 +143,13 @@ public class GuestbookController {
 
     void updateTable() {
         updateDataSize();
-        data = Main.client.getAllComments(dataSize);
+        try {
+            data = Main.client.getAllComments(dataSize);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         table = createTable();
         pageCount();
     }
@@ -134,34 +157,40 @@ public class GuestbookController {
     @FXML
     void initialize() {
         adminLabel.setVisible(false);
-        deleteMessageBtn.setVisible(false);
-        editMessageBtn.setVisible(false);
-        changeRoleBtn.setVisible(false);
+        deleteMessageButton.setVisible(false);
+        redactMessageButton.setVisible(false);
+        changeRoleButton.setVisible(false);
         if (Main.user.getRole() == 2) {
             adminLabel.setVisible(true);
-            deleteMessageBtn.setVisible(true);
-            editMessageBtn.setVisible(true);
-            changeRoleBtn.setVisible(true);
+            deleteMessageButton.setVisible(true);
+            redactMessageButton.setVisible(true);
+            changeRoleButton.setVisible(true);
         }
         pagination.setCurrentPageIndex(0);
         pageCount();
 
-        sendBtn.setOnAction(actionEvent -> {
-            messageText.setStyle("-fx-border-color: grey");
-            messageText.setPromptText("Введите сообщение...");
-            String message = messageText.getText();
+        sendMessageButton.setOnAction(actionEvent -> {
+            messageField.setStyle("-fx-border-color: grey");
+            messageField.setPromptText("Введите сообщение...");
+            String message = messageField.getText();
             if (!message.isEmpty()) {
-                messageText.clear();
-                Main.client.sendMessage(Main.user.getEmail(), message);
+                messageField.clear();
+                try {
+                    Main.client.sendMessage(Main.user.getEmail(), message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 updateTable();
             } else {
-                messageText.setStyle("-fx-border-color: red");
-                messageText.setPromptText("Поле не может быть пустым!");
+                messageField.setStyle("-fx-border-color: red");
+                messageField.setPromptText("Обязательно введите сообщение!");
             }
         });
-        exitBtn.setOnAction(actionEvent -> {
+        quitButton.setOnAction(actionEvent -> {
             //скрываем предыдущее окно
-            exitBtn.getScene().getWindow().hide();
+            quitButton.getScene().getWindow().hide();
             //загружаем новое окно
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));
@@ -178,7 +207,7 @@ public class GuestbookController {
             stage.show();
         });
 
-        updateUserInfoBtn.setOnAction(actionEvent -> {
+        updateUserInfoButton.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/client/views/EditUser.fxml"));
             try {
@@ -194,28 +223,34 @@ public class GuestbookController {
             stage.show();
         });
 
-        updateTableBtn.setOnAction(actionEvent -> {
+        updateTableButton.setOnAction(actionEvent -> {
             updateTable();
         });
 
-        deleteMessageBtn.setOnAction(actionEvent -> {
+        deleteMessageButton.setOnAction(actionEvent -> {
             if (table.getSelectionModel().getSelectedIndex() != -1){
                 int _id = table.getSelectionModel().getSelectedItem().id.getValue();
-                Main.client.deleteRowFromTable(_id, "comments");
-                table.getItems().removeAll(table.getSelectionModel().getSelectedItem());
-                updateTable();
+                try {
+                    Main.client.deleteRowFromTable(_id, "comments");
+                    table.getItems().removeAll(table.getSelectionModel().getSelectedItem());
+                    updateTable();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Предупреждение");
-                alert.setHeaderText("Ошибка");
-                alert.setContentText("Выделите строку для удаления!");
+                alert.setHeaderText("Ошибка выделения строки!");
+                alert.setContentText("Выделите строку в Гостевой Книге, чтобы удалить запись!");
                 alert.showAndWait();
             }
 
         });
 
-        editMessageBtn.setOnAction(actionEvent -> {
+        redactMessageButton.setOnAction(actionEvent -> {
             if (table.getSelectionModel().getSelectedIndex() != -1) {
                 int _id = table.getSelectionModel().getSelectedItem().id.getValue();
                 String _date = table.getSelectionModel().getSelectedItem().date.getValue();
@@ -240,12 +275,12 @@ public class GuestbookController {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Предупреждение");
                 alert.setHeaderText("Ошибка выделения строки!");
-                alert.setContentText("Выделите строку для изменения!");
+                alert.setContentText("Выделите строку в Гостевой Книге, чтобы редактировать запись!");
                 alert.showAndWait();
             }
         });
 
-        changeRoleBtn.setOnAction(actionEvent -> {
+        changeRoleButton.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/client/views/Users.fxml"));
             try {
@@ -257,11 +292,11 @@ public class GuestbookController {
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            stage.setTitle("Пользователи");
+            stage.setTitle("Аккаунты");
             stage.showAndWait();
         });
 
-        infoBtn.setOnAction(actionEvent -> {
+        informationButton.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/client/views/Info.fxml"));
             try {
@@ -273,7 +308,7 @@ public class GuestbookController {
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            stage.setTitle("Информация");
+            stage.setTitle("Информационный стенд");
             stage.showAndWait();
         });
     }
@@ -285,6 +320,7 @@ public class GuestbookController {
         return new BorderPane(table);
     }
 
+    //статический класс для представления данных в таблице
     public static class Note {
         private final ObservableValue<Integer> id;
         private final SimpleStringProperty email;
@@ -298,4 +334,6 @@ public class GuestbookController {
             this.message = new SimpleStringProperty(message);
         }
     }
+
+
 }

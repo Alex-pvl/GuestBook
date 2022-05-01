@@ -22,10 +22,9 @@ import client.main.Main;
 public class SignUpController {
     String firstName;
     String lastName;
-    String login;
+    String userName;
     String password;
     String email;
-
     @FXML
     private ResourceBundle resources;
 
@@ -33,68 +32,67 @@ public class SignUpController {
     private URL location;
 
     @FXML
-    private Button signInBtn;
+    private Button signInButton;
 
     @FXML
-    private Button signUpBtn;
+    private TextField nameField;
 
     @FXML
-    private TextField firstNameText;
+    private TextField surnameField;
 
     @FXML
-    private TextField lastNameText;
+    private TextField loginField;
 
     @FXML
-    private TextField emailText;
+    private TextField emailField;
 
     @FXML
-    private TextField loginText;
+    private PasswordField passwordField;
 
     @FXML
-    private PasswordField passwordText;
+    private Button signUpButton;
 
     @FXML
-    private Label firstNameError;
+    private Label errorLabel0;
 
     @FXML
-    private Label lastNameError;
+    private Label errorLabel1;
 
     @FXML
-    private Label emailError;
+    private Label errorLabel2;
 
     @FXML
-    private Label loginError;
+    private Label errorLabel3;
 
     @FXML
-    private Label passwordError;
+    private Label errorLabel4;
 
-    private static final String regex =
-            "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    private static final String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
-    public void init() {
-        firstNameError.setVisible(false);
-        lastNameError.setVisible(false);
-        emailError.setVisible(false);
-        loginError.setVisible(false);
-        passwordError.setVisible(false);
-        firstNameText.setStyle("-fx-border-color: grey");
-        lastNameText.setStyle("-fx-border-color: grey");
-        emailText.setStyle("-fx-border-color: grey");
-        loginText.setStyle("-fx-border-color: grey");
-        passwordText.setStyle("-fx-border-color: grey");
+    void init() {
+        errorLabel0.setVisible(false);
+        errorLabel1.setVisible(false);
+        errorLabel2.setVisible(false);
+        errorLabel3.setVisible(false);
+        errorLabel4.setVisible(false);
+        nameField.setStyle("-fx-border-color: grey");
+        surnameField.setStyle("-fx-border-color: grey");
+        loginField.setStyle("-fx-border-color: grey");
+        passwordField.setStyle("-fx-border-color: grey");
+        emailField.setStyle("-fx-border-color: grey");
     }
 
     @FXML
-    public void initialize() {
+    void initialize() {
         init();
         //обрабатываем событие - нажатие на кнопку "Зарегистрироваться"
-        signUpBtn.setOnAction(actionEvent -> {
+        signUpButton.setOnAction(actionEvent -> {
             //регистрация пользователя
-            firstName = firstNameText.getText();
-            lastName = lastNameText.getText();
-            login = loginText.getText();
-            password = passwordText.getText();
-            email = emailText.getText();
+            firstName = nameField.getText();
+            lastName = surnameField.getText();
+            userName = loginField.getText();
+            password = passwordField.getText();
+            email = emailField.getText();
             if (!Main.isConnected) {
                 Main.client = new Client();
                 Main.client.enable();
@@ -114,47 +112,47 @@ public class SignUpController {
             boolean isUsedEmail = false;
             boolean isEmailValid = false;
             if (!(firstName.isEmpty() || lastName.isEmpty()
-                    || login.isEmpty() || password.isEmpty() || email.isEmpty())) {
+                    || userName.isEmpty() || password.isEmpty() || email.isEmpty())) {
                 isFieldUsed = true;
             } else {
                 if (firstName.isEmpty()) {
-                    firstNameText.setStyle("-fx-border-color: red");
-                    firstNameError.setVisible(true);
+                    nameField.setStyle("-fx-border-color: red");
+                    errorLabel0.setVisible(true);
                 } else {
-                    firstNameText.setStyle("-fx-border-color: grey");
-                    firstNameError.setVisible(false);
+                    nameField.setStyle("-fx-border-color: grey");
+                    errorLabel0.setVisible(false);
                 }
                 if (lastName.isEmpty()) {
-                    lastNameText.setStyle("-fx-border-color: red");
-                    lastNameError.setVisible(true);
+                    surnameField.setStyle("-fx-border-color: red");
+                    errorLabel1.setVisible(true);
                 } else {
-                    lastNameText.setStyle("-fx-border-color: grey");
-                    lastNameError.setVisible(false);
+                    surnameField.setStyle("-fx-border-color: grey");
+                    errorLabel1.setVisible(false);
                 }
-                if (login.isEmpty()) {
-                    loginText.setStyle("-fx-border-color: red");
-                    loginError.setText("Поле не может быть пустым!");
-                    loginError.setVisible(true);
+                if (userName.isEmpty()) {
+                    loginField.setStyle("-fx-border-color: red");
+                    errorLabel2.setText("Введите соответсвующее поле!");
+                    errorLabel2.setVisible(true);
                 } else {
-                    loginText.setStyle("-fx-border-color: grey");
-                    loginError.setText("Поле не может быть пустым!");
-                    loginError.setVisible(false);
+                    loginField.setStyle("-fx-border-color: grey");
+                    errorLabel2.setText("Введите соответсвующее поле!");
+                    errorLabel2.setVisible(false);
                 }
                 if (password.isEmpty()) {
-                    passwordText.setStyle("-fx-border-color: red");
-                    passwordError.setVisible(true);
+                    passwordField.setStyle("-fx-border-color: red");
+                    errorLabel4.setVisible(true);
                 } else {
-                    passwordText.setStyle("-fx-border-color: grey");
-                    passwordError.setVisible(false);
+                    passwordField.setStyle("-fx-border-color: grey");
+                    errorLabel4.setVisible(false);
                 }
                 if (email.isEmpty()) {
-                    emailText.setStyle("-fx-border-color: red");
-                    emailError.setText("Поле не может быть пустым!");
-                    emailError.setVisible(true);
+                    emailField.setStyle("-fx-border-color: red");
+                    errorLabel3.setText("Введите соответсвующее поле!");
+                    errorLabel3.setVisible(true);
                 } else {
-                    emailText.setStyle("-fx-border-color: grey");
-                    emailError.setText("Поле не может быть пустым!");
-                    emailError.setVisible(false);
+                    emailField.setStyle("-fx-border-color: grey");
+                    errorLabel3.setText("Введите соответсвующее поле!");
+                    errorLabel3.setVisible(false);
                 }
             }
             Pattern pattern = Pattern.compile(regex);
@@ -162,32 +160,43 @@ public class SignUpController {
             if (matcher.matches()) {
                 isEmailValid = true;
             } else {
-                emailText.setStyle("-fx-border-color:red");
-                emailError.setText("Некорректно введён Email!");
-                emailError.setVisible(true);
+                emailField.setStyle("-fx-border-color:red");
+                errorLabel3.setText("Неправильно введён E-Mail!");
+                errorLabel3.setVisible(true);
             }
-            isUsedLogin = Main.client.isUsed("userName", login);
-            isUsedEmail = Main.client.isUsed("email", email);
+            try {
+                isUsedLogin = Main.client.isUsed("userName", userName);
+                isUsedEmail = Main.client.isUsed("email", email);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             if (isUsedLogin) {
-                loginText.setStyle("-fx-border-color:red");
-                loginError.setText("Логин занят другим пользователем!");
-                loginError.setVisible(true);
-            } else {
-                loginText.setStyle("-fx-border-color:grey");
-                loginError.setVisible(false);
-            }
+                loginField.setStyle("-fx-border-color:red");
+                errorLabel2.setText("Логин занят другим пользователем!");
+                errorLabel2.setVisible(true);
+            } /*else {
+                loginField.setStyle("-fx-border-color:grey");
+                errorLabel2.setVisible(false);
+            }*/
             if (isUsedEmail) {
-                emailText.setStyle("-fx-border-color:red");
-                emailError.setText("Email занят другим пользователем!");
-                emailError.setVisible(true);
-            } else {
-                emailText.setStyle("-fx-border-color:grey");
-                emailError.setVisible(false);
-            }
+                emailField.setStyle("-fx-border-color:red");
+                errorLabel3.setText("E-Mail занят другим пользователем!");
+                errorLabel3.setVisible(true);
+            } /*else {
+                emailField.setStyle("-fx-border-color:grey");
+                errorLabel3.setVisible(false);
+            }*/
             if (Main.isConnected && !(isUsedEmail || isUsedLogin) && isFieldUsed && isEmailValid) {
-                Main.client.registerUser(firstName, lastName, login, password, email);
+                try {
+                    Main.client.registerAccount(firstName, lastName, userName, password, email);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
                 //скрываем предыдущее окно
-                signUpBtn.getScene().getWindow().hide();
+                signUpButton.getScene().getWindow().hide();
                 //загружаем новое окно
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));
@@ -206,9 +215,9 @@ public class SignUpController {
         });
 
         //обрабатываем событие - нажатие на кнопку "Авторизоваться"
-        signInBtn.setOnAction(actionEvent -> {
+        signInButton.setOnAction(actionEvent -> {
             //скрываем предыдущее окно
-            signInBtn.getScene().getWindow().hide();
+            signInButton.getScene().getWindow().hide();
             //загружаем новое окно
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));

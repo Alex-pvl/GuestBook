@@ -7,28 +7,24 @@ public class User implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
-    private String login;
+    private String userName;
     private String password;
-    private int role;
+    private int role_id;
 
-    public User(int id, String firstName, String lastName,
-                String email, String login, String password, int role) {
+    public User(int id, String firstname, String lastname,
+                String login, String email, String password, int role_id) {
         this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = firstname;
+        this.lastName = lastname;
         this.email = email;
-        this.login = login;
+        this.userName = login;
         this.password = password;
-        this.role = role;
+        this.role_id = role_id;
     }
 
-    public User(User u) {
-        this(u.getId(), u.getFirstName(), u.getLastName(),
-             u.getEmail(), u.getLogin(), u.getPassword(), u.getRole());
-    }
-
-    public int getId() {
-        return id;
+    public User(User user){
+        this(user.getId(), user.getFirstName(), user.getLastName(),
+                user.getLogin(), user.getEmail(), user.getPassword(), user.getId());
     }
 
     public String getFirstName() {
@@ -44,7 +40,7 @@ public class User implements Serializable {
     }
 
     public String getLogin() {
-        return login;
+        return userName;
     }
 
     public String getPassword() {
@@ -52,11 +48,11 @@ public class User implements Serializable {
     }
 
     public int getRole() {
-        return role;
+        return role_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getId() {
+        return id;
     }
 
     public void setFirstName(String firstName) {
@@ -71,15 +67,19 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUserName(String login) {
+        this.userName = login;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public void setRole(int role) {
-        this.role = role;
+    public void setRole(int role_id) {
+        this.role_id = role_id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
