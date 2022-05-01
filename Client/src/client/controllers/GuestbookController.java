@@ -19,7 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import client.Main;
+import client.main.Main;
 
 public class GuestbookController {
     @FXML
@@ -164,7 +164,7 @@ public class GuestbookController {
             exitBtn.getScene().getWindow().hide();
             //загружаем новое окно
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/SignIn.fxml"));
+            loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));
             try {
                 loader.load();
             } catch (IOException e) {
@@ -180,7 +180,7 @@ public class GuestbookController {
 
         updateUserInfoBtn.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/EditUser.fxml"));
+            loader.setLocation(getClass().getResource("/client/views/EditUser.fxml"));
             try {
                 loader.load();
             } catch (IOException e) {
@@ -223,7 +223,7 @@ public class GuestbookController {
                 String _message = table.getSelectionModel().getSelectedItem().message.getValue();
                 Main.message = new Message(_id, _date, _email, _message);
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/EditMessage.fxml"));
+                loader.setLocation(getClass().getResource("/client/views/EditMessage.fxml"));
                 try {
                     loader.load();
                 } catch (IOException e) {
@@ -247,7 +247,7 @@ public class GuestbookController {
 
         changeRoleBtn.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/Users.fxml"));
+            loader.setLocation(getClass().getResource("/client/views/Users.fxml"));
             try {
                 loader.load();
             } catch (IOException e) {
@@ -263,7 +263,7 @@ public class GuestbookController {
 
         infoBtn.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/Info.fxml"));
+            loader.setLocation(getClass().getResource("/client/views/Info.fxml"));
             try {
                 loader.load();
             } catch (IOException e) {

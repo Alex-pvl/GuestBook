@@ -16,8 +16,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import client.Client;
-import client.Main;
+import client.main.Client;
+import client.main.Main;
 
 public class SignUpController {
     String firstName;
@@ -190,7 +190,7 @@ public class SignUpController {
                 signUpBtn.getScene().getWindow().hide();
                 //загружаем новое окно
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/SignIn.fxml"));
+                loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));
                 try {
                     loader.load();
                 } catch (IOException e) {
@@ -211,7 +211,7 @@ public class SignUpController {
             signInBtn.getScene().getWindow().hide();
             //загружаем новое окно
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("src/main/java/ru/alexpvl/guestbookfx/client/views/SignIn.fxml"));
+            loader.setLocation(getClass().getResource("/client/views/SignIn.fxml"));
             try {
                 loader.load();
             } catch (IOException e) {

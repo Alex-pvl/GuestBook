@@ -1,4 +1,4 @@
-package client;
+package client.main;
 
 import client.controllers.UsersController;
 import client.bean.User;
@@ -34,7 +34,7 @@ public class Client extends Thread {
     public void disconnect() {
         try {
             if (isConnected) {
-                out.writeUTF("exit");
+                out.writeUTF("quit");
                 out.flush();
                 System.out.println("Client disconnected");
             }
@@ -58,9 +58,9 @@ public class Client extends Thread {
                 Thread.sleep(500);
                 str = in.readUTF();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (str.equalsIgnoreCase("register success")) {
                 System.out.println(str);
@@ -87,9 +87,9 @@ public class Client extends Thread {
                     return str;
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println("Client exception");
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                System.out.println("Client exception");
             }
         }
         return "-1";
@@ -109,9 +109,9 @@ public class Client extends Thread {
                 Thread.sleep(500);
                 str = in.readUTF();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (str.equalsIgnoreCase("save message success")) {
                 System.out.println(str);
@@ -141,9 +141,9 @@ public class Client extends Thread {
                             user_data[5], Integer.parseInt(user_data[6]));
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
@@ -162,16 +162,16 @@ public class Client extends Thread {
                         String entry = in.readUTF();
                         int id =  Integer.parseInt(entry);
                         String email = in.readUTF();
-                        String date = in.readUTF();
                         String message = in.readUTF();
+                        String date = in.readUTF();
                         data.add(new Note(id,email,date,message));
                         i++;
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         return data;
@@ -189,9 +189,9 @@ public class Client extends Thread {
             Thread.sleep(500);
             str = in.readUTF();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         if (str.equalsIgnoreCase("change user info success")){
             System.out.println(str);
@@ -219,10 +219,11 @@ public class Client extends Thread {
                 return -1;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return -1;
     }
 
     public void deleteRowFromTable(int id, String table) {
@@ -238,9 +239,9 @@ public class Client extends Thread {
                 Thread.sleep(500);
                 str = in.readUTF();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (str.equalsIgnoreCase("delete row success")){
                 System.out.println(str);
@@ -266,9 +267,9 @@ public class Client extends Thread {
                 Thread.sleep(500);
                 str = in.readUTF();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (str.equalsIgnoreCase("change comment success")){
                 System.out.println(str);
@@ -297,10 +298,10 @@ public class Client extends Thread {
                         String email = in.readUTF();
                         int role_id = Integer.parseInt(in.readUTF());
                         String role;
-                        if (role_id == 1) {
+                        if (role_id == 0) {
                             role = "Пользователь";
                         }
-                        else if (role_id == 2){
+                        else if (role_id == 1){
                             role = "Администратор";
                         }
                         else {
@@ -311,9 +312,9 @@ public class Client extends Thread {
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         return data;
@@ -331,7 +332,7 @@ public class Client extends Thread {
                 out.flush();
                 str = in.readUTF();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (str.equalsIgnoreCase("change role success")){
                 System.out.println(str);
@@ -353,9 +354,9 @@ public class Client extends Thread {
             Thread.sleep(500);
             _value = Integer.parseInt(in.readUTF());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         if (_value != 0){
             return true;
@@ -379,6 +380,11 @@ public class Client extends Thread {
                     isConnected = true;
                     String str = "";
                     System.out.println("Connected");
+                    while (!socket.isOutputShutdown() && isEnabled) {
+                        //что здесь??????????
+                        //моно тред отправляет quit можно проеверять отправлен ли quit
+                    }
+
                     isEnabled = false;
 
                 } catch (IOException ee) {

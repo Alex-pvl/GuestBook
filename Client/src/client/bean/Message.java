@@ -1,6 +1,6 @@
 package client.bean;
 
-public class Message {
+public class Message  {
     private int id;
     private String email;
     private String message;

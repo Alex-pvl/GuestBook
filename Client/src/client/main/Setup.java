@@ -1,4 +1,4 @@
-package client;
+package client.main;
 
 public class Setup {
     public static void main(String[] args) {

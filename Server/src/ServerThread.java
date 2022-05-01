@@ -10,7 +10,7 @@ import java.util.AbstractMap;
 
 import static java.lang.Integer.parseInt;
 
-public class ServerThread extends Thread {
+public class ServerThread implements Runnable {
     private Socket clientDialog;
     ObjectOutputStream oout;
     ObjectInputStream oin;
@@ -74,8 +74,8 @@ public class ServerThread extends Thread {
                 else if (entry.equalsIgnoreCase("register")) {
                     entry = oin.readUTF();
                     var user_data = entry.split(" ");
-                    String sql = "insert into users (firstName, lastName, login, email, password, role)" +
-                            "VALUES (?, ?, ?, ?, ?, 1);";
+                    String sql = "insert into users (firstname, lastname, login, email, password, role)" +
+                            "VALUES (?, ?, ?, ?, ?, 0);";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,user_data[0]);
                     preparedStatement.setString(2,user_data[1]);
@@ -99,7 +99,7 @@ public class ServerThread extends Thread {
                     if (resultSet.next()) {
                         oout.writeUTF("authorize success");
                         int user_id = resultSet.getInt("id");
-                        int role_id = resultSet.getInt("role_id");
+                        int role_id = resultSet.getInt("role");
                         oout.writeUTF(user_id + " " + role_id);
                         oout.flush();
                         System.out.println("authorize success");
@@ -124,12 +124,12 @@ public class ServerThread extends Thread {
                         oout.writeUTF("get user info success");
                         oout.flush();
                         String id = resultSet.getString("id");
-                        String firstName = resultSet.getString("firstName");
-                        String lastName = resultSet.getString("lastName");
-                        String userName = resultSet.getString("userName");
+                        String firstName = resultSet.getString("firstname");
+                        String lastName = resultSet.getString("lastname");
+                        String userName = resultSet.getString("login");
                         String email = resultSet.getString("email");
                         String password = resultSet.getString("password");
-                        String role_id = resultSet.getString("role_id");
+                        String role_id = resultSet.getString("role");
                         oout.writeUTF(id + " " + firstName + " " +
                                 lastName + " " + userName + " " +
                                 email + " " + password + " " + role_id);
@@ -147,8 +147,8 @@ public class ServerThread extends Thread {
                     entry = oin.readUTF();
                     var user_data = entry.split(" ");
 
-                    String sql = "update users set firstName = ?, " +
-                            "lastName = ?, login = ?, " +
+                    String sql = "update users set firstname = ?, " +
+                            "lastname = ?, login = ?, " +
                             "email = ?, password = ? " +
                             "where (id = ?);";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
@@ -205,9 +205,9 @@ public class ServerThread extends Thread {
                         oout.flush();
                         oout.writeUTF(email);
                         oout.flush();
-                        oout.writeUTF(date);
-                        oout.flush();
                         oout.writeUTF(comment);
+                        oout.flush();
+                        oout.writeUTF(date);
                         oout.flush();
                     }
                 }
@@ -245,9 +245,9 @@ public class ServerThread extends Thread {
                     ResultSet resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         String id = String.valueOf(resultSet.getInt("id"));
-                        String userName = resultSet.getString("userName");
+                        String userName = resultSet.getString("login");
                         String email = resultSet.getString("email");
-                        String role_id = String.valueOf(resultSet.getInt("role_id"));
+                        String role_id = String.valueOf(resultSet.getInt("role"));
                         oout.writeUTF(id);
                         oout.flush();
                         oout.writeUTF(userName);

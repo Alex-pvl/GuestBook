@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 public class Server {
     private static final String DB_USERNAME = "postgres"; //вход в базу данных
     private static final String DB_PASSWORD = "sa3862930ha";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/guestbook";
 
     static ExecutorService executeIt = Executors.newFixedThreadPool(3);
     static Vector<Map.Entry<Integer, ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();

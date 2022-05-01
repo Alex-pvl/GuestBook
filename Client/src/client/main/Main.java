@@ -1,4 +1,4 @@
-package client;
+package client.main;
 
 import client.bean.Message;
 import javafx.application.Application;
@@ -16,7 +16,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("C:\\Users\\Александр\\Java\\GuestBookFX\\GuestBookFX\\src\\main\\java\\ru\\alexpvl\\guestbookfx\\client\\views\\SignIn.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/client/views/SignIn.fxml"));
         stage.setTitle("Авторизация");
         stage.setScene(new Scene(root));
         stage.setResizable(false);

@@ -9,8 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import client.Client;
-import client.Main;
+import client.main.Client;
+import client.main.Main;
 
 import java.io.IOException;
 import java.net.URL;
@@ -106,7 +106,7 @@ public class SignInController {
                     }
                     signInBtn.getScene().getWindow().hide();
                     FXMLLoader loader = new FXMLLoader();
-                    loader.setLocation(getClass().getResource("client/views/GuestBook.fxml"));
+                    loader.setLocation(getClass().getResource("/client/views/GuestBook.fxml"));
                     try {
                         loader.load();
                     } catch (IOException exp) {
@@ -141,14 +141,14 @@ public class SignInController {
         // Регистрация
         signUpBtn.setOnAction(e -> {
             signUpBtn.getScene().getWindow().hide();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("client/views/SignUp.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/views/SignUp.fxml"));
+            Parent root = null;
             try {
-                loader.load();
+                root = loader.load();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            Parent root = loader.getRoot();
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setResizable(false);
