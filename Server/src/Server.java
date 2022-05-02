@@ -12,13 +12,18 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * @author mercenery
+ *
+ */
 public class Server {
+
     private static final String DB_USERNAME = "postgres"; //вход в базу данных
     private static final String DB_PASSWORD = "sa3862930ha";
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
 
     static ExecutorService executeIt = Executors.newFixedThreadPool(3);
-    static Vector<Map.Entry<Integer,ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();
+    static Vector<Map.Entry<Integer, ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();
     public static Connection connection;
 
     private static ServerSocket server;
@@ -48,13 +53,13 @@ public class Server {
         // стартуем сервер на порту 3345 и инициализируем переменную для обработки консольных команд с самого сервера
         try (ServerSocket server1 = new ServerSocket(3345);
 
-             BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             server = server1;
             try {
                 connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
                 System.out.println("Server connected to database");
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
             }
             System.out.println("Server socket created, command console reader for listen to server commands");
             int i = 0;
@@ -84,7 +89,7 @@ public class Server {
                 // после получения запроса на подключение сервер создаёт сокет
                 // для общения с клиентом и отправляет его в отдельную нить
                 // в Runnable(при необходимости можно создать Callable)
-                // монопоточную нить = сервер - MonoThreadClientHandler и тот
+                // монопоточную нить = сервер - ServerThread и тот
                 // продолжает общение от лица сервера
                 var pair = new AbstractMap.SimpleEntry<>(++i,new ServerThread(client,i));
                 clients.add(pair);
@@ -100,5 +105,4 @@ public class Server {
             e.printStackTrace();
         }
     }
-
 }

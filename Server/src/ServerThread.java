@@ -1,19 +1,15 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.AbstractMap;
 
 import static java.lang.Integer.parseInt;
 
 public class ServerThread implements Runnable {
+
     private Socket clientDialog;
-    ObjectOutputStream oout;
-    ObjectInputStream oin;
+    ObjectOutputStream out;
+    ObjectInputStream in;
     private static Server server;
     int number;
     boolean isConnected = false;
@@ -23,8 +19,8 @@ public class ServerThread implements Runnable {
         clientDialog = client;
         isConnected = true;
         try {
-            oin = new ObjectInputStream(clientDialog.getInputStream());
-            oout = new ObjectOutputStream(clientDialog.getOutputStream());
+            in = new ObjectInputStream(clientDialog.getInputStream());
+            out = new ObjectOutputStream(clientDialog.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,53 +38,45 @@ public class ServerThread implements Runnable {
             System.out.println("ObjectInputStream created");
 
             System.out.println("ObjectOutputStream  created");
-            String msgout = "";
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // основная рабочая часть //
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            String msg_out = "";
 
             // начинаем диалог с подключенным клиентом в цикле, пока сокет не
             // закрыт клиентом
             while (!clientDialog.isClosed()) {
                 System.out.println("Server reading from channel");
-
                 // серверная нить ждёт в канале чтения (inputstream) получения
                 // данных клиента после получения данных считывает их
-                String entry = oin.readUTF();
-
+                String entry = in.readUTF();
                 // и выводит в консоль
                 System.out.println("READ from clientDialog message - " + entry);
-
-
                 //отключение клиента
                 if (entry.equalsIgnoreCase("quit")) {
                     // если кодовое слово получено то инициализируется закрытие
                     // серверной нити
                     System.out.println("Client initialize connections suicide ...");
-                    oout.writeUTF("quit");
-                    oout.flush();
-                    //Thread.sleep(2000);
+                    out.writeUTF("quit");
+                    out.flush();
                     break;
                 }
                 //регистрация пользователя
                 else if (entry.equalsIgnoreCase("register")) {
-                    entry = oin.readUTF();
+                    entry = in.readUTF();
                     var user_data = entry.split(" ");
                     String sql = "insert into accounts (firstName, lastName, userName, email, password, role_id)" +
                             "VALUES (?, ?, ?, ?, ?, 1);";
-                    PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
-                    preparedStatement.setString(1,user_data[0]);
-                    preparedStatement.setString(2,user_data[1]);
-                    preparedStatement.setString(3,user_data[2]);
-                    preparedStatement.setString(4,user_data[3]);
-                    preparedStatement.setString(5,user_data[4]);
-                    preparedStatement.executeUpdate();
-                    oout.writeUTF("register success");
-                    oout.flush();
+                        PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
+                        preparedStatement.setString(1,user_data[0]);
+                        preparedStatement.setString(2,user_data[1]);
+                        preparedStatement.setString(3,user_data[2]);
+                        preparedStatement.setString(4,user_data[3]);
+                        preparedStatement.setString(5,user_data[4]);
+                        preparedStatement.executeUpdate();
+                    out.writeUTF("register success");
+                    out.flush();
                 }
                 //авторизация пользователя
                 else if (entry.equalsIgnoreCase("authorize")) {
-                    entry = oin.readUTF();
+                    entry = in.readUTF();
                     var user_data = entry.split(" ");
                     String sql = "select id,role_id from accounts where (userName = ? or email = ?) and password =?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
@@ -97,22 +85,22 @@ public class ServerThread implements Runnable {
                     preparedStatement.setString(3,user_data[1]);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-                        oout.writeUTF("authorize success");
+                        out.writeUTF("authorize success");
                         int user_id = resultSet.getInt("id");
                         int role_id = resultSet.getInt("role_id");
-                        oout.writeUTF(user_id + " " + role_id);
-                        oout.flush();
+                        out.writeUTF(user_id + " " + role_id);
+                        out.flush();
                         System.out.println("authorize success");
                     }
                     else {
-                        oout.writeUTF("authorize isn't success");
-                        oout.flush();
+                        out.writeUTF("authorize isn't success");
+                        out.flush();
                         System.out.println("authorize isn't success");
                     }
                 }
                 //получение данных пользователя
                 else if (entry.equalsIgnoreCase("get user info")) {
-                    entry = oin.readUTF();
+                    entry = in.readUTF();
                     var user_data = entry.split(" ");
                     String sql = "select * from accounts where (userName = ? or email = ?) and password =?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
@@ -121,8 +109,8 @@ public class ServerThread implements Runnable {
                     preparedStatement.setString(3,user_data[1]);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-                        oout.writeUTF("get user info success");
-                        oout.flush();
+                        out.writeUTF("get user info success");
+                        out.flush();
                         String id = resultSet.getString("id");
                         String firstName = resultSet.getString("firstName");
                         String lastName = resultSet.getString("lastName");
@@ -130,23 +118,22 @@ public class ServerThread implements Runnable {
                         String email = resultSet.getString("email");
                         String password = resultSet.getString("password");
                         String role_id = resultSet.getString("role_id");
-                        oout.writeUTF(id + " " + firstName + " " +
+                        out.writeUTF(id + " " + firstName + " " +
                                 lastName + " " + userName + " " +
                                 email + " " + password + " " + role_id);
-                        oout.flush();
+                        out.flush();
                         System.out.println("get user info success");
                     }
                     else {
-                        oout.writeUTF("get user info isn't success");
-                        oout.flush();
+                        out.writeUTF("get user info isn't success");
+                        out.flush();
                         System.out.println("get user info isn't success");
                     }
                 }
                 //сохранение новых данных пользователя
                 else if (entry.equalsIgnoreCase("change user info")) {
-                    entry = oin.readUTF();
+                    entry = in.readUTF();
                     var user_data = entry.split(" ");
-
                     String sql = "update accounts set firstName = ?, " +
                             "lastName = ?, userName = ?, " +
                             "email = ?, password = ? " +
@@ -159,40 +146,40 @@ public class ServerThread implements Runnable {
                     preparedStatement.setString(5,user_data[4]);
                     preparedStatement.setInt(6, parseInt(user_data[5]));
                     preparedStatement.executeUpdate();
-                    oout.writeUTF("change user info success");
-                    oout.flush();
+                    out.writeUTF("change user info success");
+                    out.flush();
                 }
                 //сохранение нового сообщения в базу данных
                 else if (entry.equalsIgnoreCase("send new message")){
-                    String email = oin.readUTF();
-                    String message = oin.readUTF();
+                    String email = in.readUTF();
+                    String message = in.readUTF();
                     String sql = "insert into comments (email, message) VALUES (?,?);";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,email);
                     preparedStatement.setString(2,message);
                     preparedStatement.executeUpdate();
-                    oout.writeUTF("save message success");
-                    oout.flush();
+                    out.writeUTF("save message success");
+                    out.flush();
                 }
                 //получение данных о количестве строк в таблице
                 else if (entry.equalsIgnoreCase("get count of table")){
-                    String table = oin.readUTF();
+                    String table = in.readUTF();
                     String sql = "select count(*) from " + table + ";";
                     System.out.println(sql);
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
                     String count = "-1";
                     while (resultSet.next()){
-                        count =  resultSet.getString("count");
+                       count =  resultSet.getString("count");
                     }
-                    oout.writeUTF("get count of table success");
-                    oout.flush();
-                    oout.writeUTF(count);
-                    oout.flush();
+                    out.writeUTF("get count of table success");
+                    out.flush();
+                    out.writeUTF(count);
+                    out.flush();
                 }
                 //получение всех отзывов в порядке убывания даты
                 else if (entry.equalsIgnoreCase("get all comments")){
-                    oout.writeUTF("get all comments success");
+                    out.writeUTF("get all comments success");
                     String sql = "select * from comments order by date desc";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
@@ -201,45 +188,45 @@ public class ServerThread implements Runnable {
                         String email = resultSet.getString("email");
                         String date = resultSet.getString("date");
                         String comment = resultSet.getString("message");
-                        oout.writeUTF(id);
-                        oout.flush();
-                        oout.writeUTF(email);
-                        oout.flush();
-                        oout.writeUTF(date);
-                        oout.flush();
-                        oout.writeUTF(comment);
-                        oout.flush();
+                        out.writeUTF(id);
+                        out.flush();
+                        out.writeUTF(email);
+                        out.flush();
+                        out.writeUTF(date);
+                        out.flush();
+                        out.writeUTF(comment);
+                        out.flush();
                     }
                 }
                 //удаление выбранной записи из таблицы
                 else if (entry.equalsIgnoreCase("delete row")){
-                    String id = oin.readUTF();
-                    String table = oin.readUTF();
+                    String id = in.readUTF();
+                    String table = in.readUTF();
                     String sql = "delete from "+ table +" where id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setInt(1, parseInt(id));
                     preparedStatement.executeUpdate();
-                    oout.writeUTF("delete row success");
-                    oout.flush();
+                    out.writeUTF("delete row success");
+                    out.flush();
                 }
                 //изменение данных в записях комментариев
                 else if (entry.equalsIgnoreCase("change comment")){
-                    String id = oin.readUTF();
-                    String email = oin.readUTF();
-                    String comment = oin.readUTF();
+                    String id = in.readUTF();
+                    String email = in.readUTF();
+                    String comment = in.readUTF();
                     String sql = "update comments set email = ?, message = ? where id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,email);
                     preparedStatement.setString(2,comment);
                     preparedStatement.setInt(3,Integer.parseInt(id));
                     preparedStatement.executeUpdate();
-                    oout.writeUTF("change comment success");
-                    oout.flush();
+                    out.writeUTF("change comment success");
+                    out.flush();
                 }
                 //получение всех аккаунтов из базы данных
                 else if (entry.equalsIgnoreCase("get all users")) {
-                    oout.writeUTF("get all users success");
-                    oout.flush();
+                    out.writeUTF("get all users success");
+                    out.flush();
                     String sql = "select * from accounts;";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
@@ -248,67 +235,54 @@ public class ServerThread implements Runnable {
                         String userName = resultSet.getString("userName");
                         String email = resultSet.getString("email");
                         String role_id = String.valueOf(resultSet.getInt("role_id"));
-                        oout.writeUTF(id);
-                        oout.flush();
-                        oout.writeUTF(userName);
-                        oout.flush();
-                        oout.writeUTF(email);
-                        oout.flush();
-                        oout.writeUTF(role_id);
-                        oout.flush();
+                        out.writeUTF(id);
+                        out.flush();
+                        out.writeUTF(userName);
+                        out.flush();
+                        out.writeUTF(email);
+                        out.flush();
+                        out.writeUTF(role_id);
+                        out.flush();
                     }
                 }
                 //изменение роли у пользователей
                 else if (entry.equalsIgnoreCase("change role")) {
-                    String id = oin.readUTF();
-                    String role_id = oin.readUTF();
+                    String id = in.readUTF();
+                    String role_id = in.readUTF();
                     String sql = "update accounts set role_id = ? where id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setInt(1,Integer.parseInt(role_id));
                     preparedStatement.setInt(2,Integer.parseInt(id));
                     preparedStatement.executeUpdate();
-                    oout.writeUTF("change role success");
-                    oout.flush();
+                    out.writeUTF("change role success");
+                    out.flush();
                 }
                 //проверка на то, что в базе есть аккаунт с данной почтой или никнеймом
                 else if (entry.equalsIgnoreCase("is used")){
-                    String tableField = oin.readUTF();
-                    String value = oin.readUTF();
+                    String tableField = in.readUTF();
+                    String value = in.readUTF();
                     String sql = "select count(" + tableField + ") from accounts where " + tableField + " = '" + value + "';";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
                     while(resultSet.next()) {
                         int count = resultSet.getInt("count");
-                        oout.writeUTF(String.valueOf(count));
-                        oout.flush();
+                        out.writeUTF(String.valueOf(count));
+                        out.flush();
                     }
                 }
             }
             // освобождаем буфер сетевых сообщений
-
             // возвращаемся в началло для считывания нового сообщения
-
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // основная рабочая часть //
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
             // если условие выхода - верно выключаем соединения
             System.out.println("Client disconnected");
             System.out.println("Closing connections & channels.");
-
             // закрываем сначала каналы сокета !
-            oin.close();
-            oout.close();
-
+            in.close();
+            out.close();
             // потом закрываем сокет общения с клиентом в нити моносервера
             clientDialog.close();
-
             System.out.println("Closing connections & channels - DONE.");
-
             server.clients.removeElement(new AbstractMap.SimpleEntry<>(number, this));
-
-
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
