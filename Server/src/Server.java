@@ -12,10 +12,6 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author mercenery
- *
- */
 public class Server {
 
     private static final String DB_USERNAME = "postgres"; //вход в базу данных
@@ -51,7 +47,7 @@ public class Server {
             e.printStackTrace();
         }
         // стартуем сервер на порту 3345 и инициализируем переменную для обработки консольных команд с самого сервера
-        try (ServerSocket server1 = new ServerSocket(3345);
+        try (ServerSocket server1 = new ServerSocket(8083);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             server = server1;

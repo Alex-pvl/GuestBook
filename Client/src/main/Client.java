@@ -308,7 +308,7 @@ public class Client extends Thread {
         // запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
         while (isEnabled) {
             try {
-                socket = new Socket("localhost", 3345);
+                socket = new Socket("localhost", 8083);
                 try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                      ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
                     this.out = out;
