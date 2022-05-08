@@ -45,13 +45,13 @@ public class UsersController {
     private TableView<Account> createTable() {
         TableView<Account> table = new TableView<>();
 
-        TableColumn<Account,Integer> idColumn = new TableColumn<>("id");
+        TableColumn<Account,Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> param.getValue().id);
         idColumn.setPrefWidth(30);
         idColumn.setResizable(false);
         idColumn.setSortable(false);
 
-        TableColumn<Account,String> userNameColumn = new TableColumn<>("login");
+        TableColumn<Account,String> userNameColumn = new TableColumn<>("Логин");
         userNameColumn.setCellValueFactory(param -> param.getValue().userName);
         userNameColumn.setPrefWidth(150);
         userNameColumn.setMinWidth(100);
@@ -90,7 +90,7 @@ public class UsersController {
 
     void updateDataSize(){
         try {
-            dataSize = Main.client.getCountOfTable("accounts");
+            dataSize = Main.client.getCountOfTable("messages");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -134,7 +134,7 @@ public class UsersController {
             if (table.getSelectionModel().getSelectedIndex() != -1) {
                 int _id = table.getSelectionModel().getSelectedItem().id.getValue();
                 try {
-                    Main.client.deleteRowFromTable(_id, "accounts");
+                    Main.client.deleteRowFromTable(_id, "messages");
                     table.getItems().removeAll(table.getSelectionModel().getSelectedItem());
                     updateTable();
                 } catch (IOException e) {
@@ -145,7 +145,7 @@ public class UsersController {
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Предупреждение");
+                alert.setTitle("Error!");
                 alert.setHeaderText("Ошибка!");
                 alert.setContentText("Выделите строку для удаления пользователя!");
                 alert.showAndWait();
@@ -169,7 +169,7 @@ public class UsersController {
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Предупреждение");
+                alert.setTitle("Error!");
                 alert.setHeaderText("Ошибка!");
                 alert.setContentText("Выделите строку для смены роли!");
                 alert.showAndWait();

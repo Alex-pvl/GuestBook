@@ -166,7 +166,7 @@ public class SignUpController {
                 emailError.setVisible(true);
             }
             try {
-                isUsedLogin = Main.client.isUsed("userName", userName);
+                isUsedLogin = Main.client.isUsed("username", userName);
                 isUsedEmail = Main.client.isUsed("email", email);
             } catch (IOException e) {
                 e.printStackTrace();

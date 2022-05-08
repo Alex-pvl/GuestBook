@@ -150,7 +150,7 @@ public class EditUserController {
                 emailError.setVisible(true);
             }
             try {
-                isUsedLogin = Main.client.isUsed("userName", login);
+                isUsedLogin = Main.client.isUsed("username", login);
                 isUsedEmail = Main.client.isUsed("email", email);
             } catch (IOException e) {
                 e.printStackTrace();

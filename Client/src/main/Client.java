@@ -129,13 +129,13 @@ public class Client extends Thread {
     public List<Note> getAllComments (int dataSize) throws IOException, InterruptedException {
        List<Note> data = new ArrayList<>();
        if (isConnected) {
-          String clientCommand = "get all comments";
+          String clientCommand = "get all messages";
           out.writeUTF(clientCommand);
           out.flush();
           Thread.sleep(500);
           String str = in.readUTF();
           int i = 0;
-          if (str.equalsIgnoreCase("get all comments success")){
+          if (str.equalsIgnoreCase("get all messages success")){
               System.out.println(str);
               while (i < dataSize) {
                   String entry = in.readUTF();
@@ -209,24 +209,22 @@ public class Client extends Thread {
         }
     }
 
-    public void saveCommentChange(int id, String email, String comment) throws IOException, InterruptedException {
+    public void saveCommentChange(int id, String comment) throws IOException, InterruptedException {
         if (isConnected){
-            String clientCommand = "change comment";
+            String clientCommand = "change message";
             out.writeUTF(clientCommand);
             out.flush();
             out.writeUTF(String.valueOf(id));
-            out.flush();
-            out.writeUTF(email);
             out.flush();
             out.writeUTF(comment);
             out.flush();
             Thread.sleep(500);
             String str = in.readUTF();
-            if (str.equalsIgnoreCase("change comment success")){
+            if (str.equalsIgnoreCase("change message success")){
                 System.out.println(str);
             }
             else {
-                System.out.println("change comment isn't success");
+                System.out.println("change message isn't success");
             }
         }
     }
@@ -308,7 +306,7 @@ public class Client extends Thread {
         // запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
         while (isEnabled) {
             try {
-                socket = new Socket("localhost", 8083);
+                socket = new Socket("127.0.0.1", 8083);
                 try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                      ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
                     this.out = out;

@@ -119,7 +119,7 @@ public class GuestbookController {
 
     void updateDataSize() {
         try {
-            dataSize = Main.client.getCountOfTable("comments");
+            dataSize = Main.client.getCountOfTable("messages");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -228,7 +228,7 @@ public class GuestbookController {
             if (table.getSelectionModel().getSelectedIndex() != -1){
                 int _id = table.getSelectionModel().getSelectedItem().id.getValue();
                 try {
-                    Main.client.deleteRowFromTable(_id, "comments");
+                    Main.client.deleteRowFromTable(_id, "messages");
                     table.getItems().removeAll(table.getSelectionModel().getSelectedItem());
                     updateTable();
                 } catch (IOException e) {
@@ -239,7 +239,7 @@ public class GuestbookController {
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Предупреждение");
+                alert.setTitle("Error");
                 alert.setHeaderText("Ошибка!");
                 alert.setContentText("Выделите строку для удаления!");
                 alert.showAndWait();
@@ -270,7 +270,7 @@ public class GuestbookController {
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Предупреждение");
+                alert.setTitle("Error!");
                 alert.setHeaderText("Ошибка!");
                 alert.setContentText("Выделите строку для редактирования!");
                 alert.showAndWait();
