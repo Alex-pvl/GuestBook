@@ -13,12 +13,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-
-    private static final String DB_USERNAME = "postgres"; //вход в базу данных
+    private static final String DB_USERNAME = "postgres";
     private static final String DB_PASSWORD = "sa3862930ha";
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
 
-    static ExecutorService executeIt = Executors.newFixedThreadPool(3);
+    static ExecutorService executeIt = Executors.newFixedThreadPool(5);
     static Vector<Map.Entry<Integer, ServerThread>> clients = new Vector<Map.Entry<Integer, ServerThread>>();
     public static Connection connection;
 
@@ -36,7 +35,7 @@ public class Server {
 
     public void enable() throws IOException {
         isEnabled = true;
-        System.out.println("Server enabled");
+        System.out.println("Server started");
     }
 
     public static void main(String[] args) {
@@ -57,18 +56,12 @@ public class Server {
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
-            System.out.println("Server socket created, command console reader for listen to server commands");
+            System.out.println("ServerSocket created");
             int i = 0;
             // стартуем цикл при условии что серверный сокет не закрыт
             while (!server.isClosed() && isEnabled) {
-
-                // проверяем поступившие комманды из консоли сервера если такие
-                // были
+                // проверяем поступившие комманды из консоли сервера если были
                 if (br.ready()) {
-                    System.out.println("Main Server found any messages in channel, let's look at them.");
-
-                    // если команда - quit то инициализируем закрытие сервера и
-                    // выход из цикла раздачии нитей монопоточных серверов
                     String serverCommand = br.readLine();
                     if (serverCommand.equalsIgnoreCase("quit")) {
                         System.out.println("Main Server initiate exiting...");
@@ -76,7 +69,6 @@ public class Server {
                         break;
                     }
                 }
-
                 // если комманд от сервера нет то становимся в ожидание
                 // подключения к сокету общения под именем - "clientDialog" на
                 // серверной стороне

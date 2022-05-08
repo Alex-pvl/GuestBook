@@ -90,7 +90,7 @@ public class UsersController {
 
     void updateDataSize(){
         try {
-            dataSize = Main.client.getCountOfTable("messages");
+            dataSize = Main.client.getCountOfTable("users");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -134,7 +134,7 @@ public class UsersController {
             if (table.getSelectionModel().getSelectedIndex() != -1) {
                 int _id = table.getSelectionModel().getSelectedItem().id.getValue();
                 try {
-                    Main.client.deleteRowFromTable(_id, "messages");
+                    Main.client.deleteRowFromTable(_id, "users");
                     table.getItems().removeAll(table.getSelectionModel().getSelectedItem());
                     updateTable();
                 } catch (IOException e) {

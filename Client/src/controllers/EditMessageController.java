@@ -11,7 +11,6 @@ import javafx.scene.control.TextArea;
 import main.Main;
 
 public class EditMessageController {
-    private String email;
     private String message;
 
     @FXML
@@ -35,10 +34,7 @@ public class EditMessageController {
     @FXML
     private Button saveBtn;
 
-    private static final String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-
     void init() {
-        //emailText.setStyle("-fx-border-color: grey");
         messageText.setStyle("-fx-border-color: grey");
     }
 
@@ -50,40 +46,18 @@ public class EditMessageController {
         emailLabel.setText(Main.comment.getEmail());
         messageText.setText(Main.comment.getMessage());
 
-
         saveBtn.setOnAction(actionEvent -> {
             init();
-            //email = emailLabel.getText();
             message = messageText.getText();
             boolean isFieldUsed = false;
             if (!message.isEmpty()) {
                 isFieldUsed = true;
+                messageText.setStyle("-fx-border-color: grey");
+                messageText.setPromptText("Введите сообщение...");
             } else {
-                /*if (email.isEmpty()) {
-                    emailText.setStyle("-fx-border-color: red");
-                    emailText.setPromptText("Поле не может быть пустым!");
-                } else {
-                    emailText.setStyle("-fx-border-color: grey");
-                    emailText.setPromptText("Введите Email...");
-                }*/
-                if (message.isEmpty()) {
-                    messageText.setStyle("-fx-border-color: red");
-                    messageText.setPromptText("Поле не может быть пустым!");
-                } else {
-                    messageText.setStyle("-fx-border-color: grey");
-                    messageText.setPromptText("Введите сообщение...");
-                }
+                messageText.setStyle("-fx-border-color: red");
+                messageText.setPromptText("Поле не может быть пустым!");
             }
-            /*boolean isEmailValid = false;
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(email);
-            if (matcher.matches()) {
-                isEmailValid = true;
-            } else {
-                emailText.setStyle("-fx-border-color:red");
-                emailText.clear();
-                emailText.setPromptText("Email введен некорректно!");
-            }*/
             if (Main.isConnected && isFieldUsed){
                 try {
                     Main.client.saveCommentChange(Main.comment.getId(), message);

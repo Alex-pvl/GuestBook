@@ -35,14 +35,14 @@ public class Client extends Thread {
             if (isConnected) {
                 out.writeUTF("quit");
                 out.flush();
-                System.out.println("Client kill connections");
+                System.out.println("Client quit");
             }
             disable();
         }
         catch(IOException e) {
             isConnected = false;
             isEnabled = false;
-            System.out.println("Клиент разорвал соединение");
+            System.out.println("Клиент отключился");
         }
 
 
@@ -166,7 +166,7 @@ public class Client extends Thread {
             System.out.println(str);
         }
         else {
-            System.out.println("change user info isn't success");
+            System.out.println("change userInfo isn't success");
         }
     }
 

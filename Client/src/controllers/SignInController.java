@@ -137,7 +137,7 @@ public class SignInController {
                         passwordText.clear();
                     }
                     else if (msign.equalsIgnoreCase("-1"))
-                        System.out.println("Unknown Error");
+                        System.out.println("Error");
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
