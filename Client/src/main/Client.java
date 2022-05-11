@@ -42,7 +42,6 @@ public class Client extends Thread {
         catch(IOException e) {
             isConnected = false;
             isEnabled = false;
-            System.out.println("Клиент отключился");
         }
 
 
@@ -118,7 +117,7 @@ public class Client extends Thread {
             String str = in.readUTF();
             if (str.equalsIgnoreCase("get user info success")){
                 String data = in.readUTF();
-                var user_data = data.split(" ");
+                String[] user_data = data.split(" ");
                 Main.user = new User(Integer.parseInt(user_data[0]), user_data[1],
                         user_data[2], user_data[3], user_data[4],
                         user_data[5], Integer.parseInt(user_data[6]));
@@ -292,18 +291,12 @@ public class Client extends Thread {
         out.flush();
         Thread.sleep(500);
         int _value = Integer.parseInt(in.readUTF());
-        if (_value != 0){
-            return true;
-        }
-        else {
-            return false;
-        }
+        return _value != 0;
     }
 
     @Override
     public void run() {
         super.run();
-        // запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
         while (isEnabled) {
             try {
                 socket = new Socket("127.0.0.1", 8083);
@@ -312,11 +305,8 @@ public class Client extends Thread {
                     this.out = out;
                     this.in = in;
                     isConnected = true;
-                    String str = "";
                     System.out.println("Connected");
-                    while (!socket.isOutputShutdown() && isEnabled) {
-
-                    }
+                    while (!socket.isOutputShutdown() && isEnabled) {}
                     isEnabled = false;
                 } catch (IOException ee) {
                     ee.printStackTrace();
@@ -325,7 +315,7 @@ public class Client extends Thread {
                 isConnected = false;
                 System.err.println("Can't connect to server!");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }

@@ -102,7 +102,7 @@ public class SignInController {
                     if (!(msign.equalsIgnoreCase("authorize isn't success")
                             || msign.equalsIgnoreCase("-1"))){
                         Main.client.setUserInfo(login, password);
-                        var user_data = msign.split(" ");
+                        String[] user_data = msign.split(" ");
                         if (Main.user.getRole() == 1) {
                             System.out.println("Welcome, user(" + login + ")!");
                         }

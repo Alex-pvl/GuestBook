@@ -28,32 +28,15 @@ public class ServerThread implements Runnable {
 
     @Override
     public void run() {
-
         try {
-            // инициируем каналы общения в сокете, для сервера
-
-            // канал записи в сокет следует инициализировать сначала канал чтения для избежания блокировки выполнения
-            // программы на ожидании заголовка в сокете
-
-            System.out.println("ObjectInputStream created");
-
-            System.out.println("ObjectOutputStream  created");
             String msg_out = "";
-
-            // начинаем диалог с подключенным клиентом в цикле, пока сокет не
-            // закрыт клиентом
             while (!clientDialog.isClosed()) {
                 System.out.println("Server reading from channel");
-                // серверная нить ждёт в канале чтения (inputstream) получения
-                // данных клиента после получения данных считывает их
                 String entry = in.readUTF();
-                // и выводит в консоль
-                System.out.println("READ from clientDialog message - " + entry);
+                System.out.println("read msg: " + entry);
                 //отключение клиента
                 if (entry.equalsIgnoreCase("quit")) {
-                    // если кодовое слово получено то инициализируется закрытие
-                    // серверной нити
-                    System.out.println("Client initialize connections suicide ...");
+                    System.out.println("quit");
                     out.writeUTF("quit");
                     out.flush();
                     break;
@@ -61,9 +44,8 @@ public class ServerThread implements Runnable {
                 //регистрация пользователя
                 else if (entry.equalsIgnoreCase("register")) {
                     entry = in.readUTF();
-                    var user_data = entry.split(" ");
-                    String sql = "insert into users (firstname, lastname, username, email, password, role)" +
-                            "VALUES (?, ?, ?, ?, ?, 1);";
+                    String[] user_data = entry.split(" ");
+                    String sql = "INSERT INTO users (firstname, lastname, username, email, password, role) VALUES (?, ?, ?, ?, ?, 1);";
                         PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                         preparedStatement.setString(1,user_data[0]);
                         preparedStatement.setString(2,user_data[1]);
@@ -77,8 +59,8 @@ public class ServerThread implements Runnable {
                 //авторизация пользователя
                 else if (entry.equalsIgnoreCase("authorize")) {
                     entry = in.readUTF();
-                    var user_data = entry.split(" ");
-                    String sql = "select id,role from users where (username = ? or email = ?) and password =?;";
+                    String[] user_data = entry.split(" ");
+                    String sql = "SELECT id,role FROM users WHERE (username = ? OR email = ?) AND password =?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,user_data[0]);
                     preparedStatement.setString(2,user_data[0]);
@@ -102,7 +84,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("get user info")) {
                     entry = in.readUTF();
                     var user_data = entry.split(" ");
-                    String sql = "select * from users where (username = ? or email = ?) and password =?;";
+                    String sql = "SELECT * FROM users WHERE (username = ? OR email = ?) AND password =?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,user_data[0]);
                     preparedStatement.setString(2,user_data[0]);
@@ -118,9 +100,7 @@ public class ServerThread implements Runnable {
                         String email = resultSet.getString("email");
                         String password = resultSet.getString("password");
                         String role_id = resultSet.getString("role");
-                        out.writeUTF(id + " " + firstName + " " +
-                                lastName + " " + userName + " " +
-                                email + " " + password + " " + role_id);
+                        out.writeUTF(id + " " + firstName + " " + lastName + " " + userName + " " + email + " " + password + " " + role_id);
                         out.flush();
                         System.out.println("get user info success");
                     }
@@ -133,11 +113,8 @@ public class ServerThread implements Runnable {
                 //сохранение новых данных пользователя
                 else if (entry.equalsIgnoreCase("change user info")) {
                     entry = in.readUTF();
-                    var user_data = entry.split(" ");
-                    String sql = "update users set firstname = ?, " +
-                            "lastname = ?, username = ?, " +
-                            "email = ?, password = ? " +
-                            "where (id = ?);";
+                    String[] user_data = entry.split(" ");
+                    String sql = "UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ? WHERE (id = ?);";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,user_data[0]);
                     preparedStatement.setString(2,user_data[1]);
@@ -153,7 +130,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("send new message")){
                     String email = in.readUTF();
                     String message = in.readUTF();
-                    String sql = "insert into messages (email, message) VALUES (?,?);";
+                    String sql = "INSERT INTO messages (email, message) VALUES (?,?);";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,email);
                     preparedStatement.setString(2,message);
@@ -164,7 +141,7 @@ public class ServerThread implements Runnable {
                 //получение данных о количестве строк в таблице
                 else if (entry.equalsIgnoreCase("get count of table")){
                     String table = in.readUTF();
-                    String sql = "select count(*) from " + table + ";";
+                    String sql = "SELECT COUNT(*) FROM " + table + ";";
                     System.out.println(sql);
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
@@ -180,7 +157,7 @@ public class ServerThread implements Runnable {
                 //получение всех отзывов в порядке убывания даты
                 else if (entry.equalsIgnoreCase("get all messages")){
                     out.writeUTF("get all messages success");
-                    String sql = "select * from messages order by date desc";
+                    String sql = "SELECT * FROM messages ORDER BY date DESC";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
@@ -202,7 +179,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("delete row")){
                     String id = in.readUTF();
                     String table = in.readUTF();
-                    String sql = "delete from "+ table +" where id = ?;";
+                    String sql = "DELETE FROM "+ table +" WHERE id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setInt(1, parseInt(id));
                     preparedStatement.executeUpdate();
@@ -213,7 +190,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("change message")){
                     String id = in.readUTF();
                     String comment = in.readUTF();
-                    String sql = "update messages set message = ? where id = ?;";
+                    String sql = "UPDATE messages SET message = ? WHERE id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setString(1,comment);
                     preparedStatement.setInt(2,Integer.parseInt(id));
@@ -225,7 +202,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("get all users")) {
                     out.writeUTF("get all users success");
                     out.flush();
-                    String sql = "select * from users;";
+                    String sql = "SELECT * FROM users;";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
@@ -247,7 +224,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("change role")) {
                     String id = in.readUTF();
                     String role_id = in.readUTF();
-                    String sql = "update users set role = ? where id = ?;";
+                    String sql = "UPDATE users SET role = ? WHERE id = ?;";
                     PreparedStatement preparedStatement = server.connection.prepareStatement(sql);
                     preparedStatement.setInt(1,Integer.parseInt(role_id));
                     preparedStatement.setInt(2,Integer.parseInt(id));
@@ -259,7 +236,7 @@ public class ServerThread implements Runnable {
                 else if (entry.equalsIgnoreCase("is used")){
                     String tableField = in.readUTF();
                     String value = in.readUTF();
-                    String sql = "select count(" + tableField + ") from users where " + tableField + " = '" + value + "';";
+                    String sql = "SELECT COUNT(" + tableField + ") FROM users WHERE " + tableField + " = '" + value + "';";
                     Statement statement = server.connection.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql);
                     while(resultSet.next()) {
@@ -269,17 +246,9 @@ public class ServerThread implements Runnable {
                     }
                 }
             }
-            // освобождаем буфер сетевых сообщений
-            // возвращаемся в началло для считывания нового сообщения
-            // если условие выхода - верно выключаем соединения
-            System.out.println("Client disconnected");
-            System.out.println("Closing connections & channels.");
-            // закрываем сначала каналы сокета !
             in.close();
             out.close();
-            // потом закрываем сокет общения с клиентом в нити моносервера
             clientDialog.close();
-            System.out.println("Closing connections & channels - DONE.");
             server.clients.removeElement(new AbstractMap.SimpleEntry<>(number, this));
         } catch (IOException | SQLException e) {
             e.printStackTrace();

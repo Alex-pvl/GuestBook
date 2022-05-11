@@ -103,7 +103,7 @@ public class GuestbookController {
         return table;
     }
 
-    //этот метод используется для заполнения данных в таблицу
+    //заполнение данных в таблицу
     private List<Note> createData() {
         updateDataSize();
         List<Note> data = null;
